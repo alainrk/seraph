@@ -8,9 +8,12 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"bufio"
+	"os"
+	"strings"
 )
 
-func encrypt(keyString string, plaintext string) string {
+func encrypt(keyString string, plaintext string) (encryptedString string) {
 	key, _ := hex.DecodeString(keyString)
 	plaintextBytes := []byte(plaintext)
 
@@ -35,7 +38,7 @@ func encrypt(keyString string, plaintext string) string {
 	return fmt.Sprintf("%x", ciphertext)
 }
 
-func decrypt(keyString string, ciphertext string) string {
+func decrypt(keyString string, ciphertext string) (decryptedString string) {
 	key, _ := hex.DecodeString(keyString)
 	enc, _ := hex.DecodeString(string(ciphertext))
 
@@ -56,8 +59,22 @@ func decrypt(keyString string, ciphertext string) string {
 	return string(plaintext)
 }
 
+// Prompt the output on stdin and returns the clean input string given from the user
+func prompt(output string) (inputString string) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print(output)
+	text, err := reader.ReadString('\n')
+	text = strings.TrimRight(text, "\n\r")
+	if err != nil {
+		panic(err)
+	}
+	return text
+}
+
 func main() {
-	passphrase := "helloworld"
+	// passphrase := "helloworld"
+	passphrase := prompt("Insert key: ")
+	fmt.Printf("Your key: ---%s---\n", passphrase)
 	plaintext := "This is a great secret to keep!"
 
 	keyBytes := sha256.Sum256([]byte(passphrase))
