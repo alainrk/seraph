@@ -3,20 +3,16 @@
 package main
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/sha256"
-	"encoding/hex"
-	"fmt"
 	"bufio"
+	"flag"
+	"fmt"
 	"os"
 	"strings"
-	"flag"
 )
 
 type flags struct {
-	mode string
-	passphrase string
+	mode        string
+	passphrase  string
 	__isEncrypt bool
 	__isDecrypt bool
 }
@@ -35,52 +31,6 @@ func (sf *stringFlag) Set(x string) error {
 
 func (sf *stringFlag) String() string {
 	return sf.value
-}
-
-func encrypt(keyString string, plaintext string) string {
-	key, _ := hex.DecodeString(keyString)
-	plaintextBytes := []byte(plaintext)
-
-	// key[:] => shortcut to copy and get a slice of []bytes
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		panic(err)
-	}
-
-	// see: https://en.wikipedia.org/wiki/Galois/Counter_Mode
-	aesGCM, err := cipher.NewGCM(block)
-	if err != nil {
-		panic(err)
-	}
-
-	// nonce creation from gcm
-	nonce := make([]byte, aesGCM.NonceSize())
-
-	// encryption of data with gcm seal
-	ciphertext := aesGCM.Seal(nonce, nonce, plaintextBytes, nil)
-
-	return fmt.Sprintf("%x", ciphertext)
-}
-
-func decrypt(keyString string, ciphertext string) string {
-	key, _ := hex.DecodeString(keyString)
-	enc, _ := hex.DecodeString(string(ciphertext))
-
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		panic(err)
-	}
-
-	aesGCM, err := cipher.NewGCM(block)
-	if err != nil {
-		panic(err)
-	}
-
-	nonceSize := aesGCM.NonceSize()
-	nonce, encrypted := enc[:nonceSize], enc[nonceSize:]
-	plaintext, err := aesGCM.Open(nil, nonce, encrypted, nil)
-
-	return string(plaintext)
 }
 
 // Prompt the output on stdin and returns the clean input string given from the user
@@ -149,10 +99,7 @@ func main() {
 
 	plaintext := "This is a great secret to keep!"
 
-	keyBytes := sha256.Sum256([]byte(passphrase))
-	key := hex.EncodeToString(keyBytes[:])
-
-	fmt.Printf("KeyBytes: %x\nKey: %s\n", keyBytes, key)
+	key := hashPassphrase(passphrase)
 
 	ciphertext := encrypt(key, plaintext)
 	fmt.Printf("Encrypted: %x\n", ciphertext)
