@@ -52,6 +52,9 @@ func decrypt(keyString string, ciphertext string) string {
 	nonceSize := aesGCM.NonceSize()
 	nonce, encrypted := enc[:nonceSize], enc[nonceSize:]
 	plaintext, err := aesGCM.Open(nil, nonce, encrypted, nil)
+	if err != nil {
+		panic(err)
+	}
 
 	return string(plaintext)
 }
