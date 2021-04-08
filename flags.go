@@ -1,5 +1,3 @@
-// Inspired by and thanks to https://www.melvinvivas.com/how-to-encrypt-and-decrypt-data-using-aes/
-
 package main
 
 import (
@@ -11,10 +9,9 @@ import (
 )
 
 type flags struct {
-	mode        string
 	passphrase  string
-	__isEncrypt bool
-	__isDecrypt bool
+	encryptMode bool
+	decryptMode bool
 }
 
 // implement stringFlag to distinguish empty string given
@@ -69,12 +66,10 @@ func getFlags() (flagsObject *flags) {
 	flagsObject = &flags{}
 
 	if encryptFlag {
-		flagsObject.mode = "encrypt"
-		flagsObject.__isEncrypt = true
+		flagsObject.encryptMode = true
 	}
 	if decryptFlag {
-		flagsObject.mode = "decrypt"
-		flagsObject.__isDecrypt = true
+		flagsObject.decryptMode = true
 	}
 
 	if !passphraseFlag.set {
@@ -86,6 +81,5 @@ func getFlags() (flagsObject *flags) {
 		flagsObject.passphrase = passphraseFlag.value
 	}
 
-	fmt.Println(flagsObject)
 	return flagsObject
 }
