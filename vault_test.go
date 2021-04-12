@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 	"time"
 )
@@ -80,11 +79,38 @@ func TestVaultOperations(t *testing.T) {
 	v.add(s)
 
 	// fmt.Println("Insert secret:", s)
-	fmt.Println(v)
+	// fmt.Println(v)
 
 	given, _ = v.len()
 	expected = 2
 	if given != expected {
 		t.Errorf("Failed vault length retrieval after adding. Given = %d, Expected = %d", given, expected)
+	}
+
+	s.Name = "AKey number one"
+	v.add(s)
+	s.Name = "Das key nummer zwei"
+	v.add(s)
+	s.Name = "Ze kous nomiro dri"
+	v.add(s)
+	keys, err := v.getKeys()
+	if err != nil {
+		t.Errorf("Error getting vault keys, Error = %s", err)
+	}
+
+	if keys[2] != "Lorem" {
+		t.Errorf("Wrong keys sorting, Expected = %s, Given = %s", "Lorem", keys[2])
+	}
+	// fmt.Println("Keys:", strings.Join(keys, ", "))
+}
+
+func TestEmptyVault(t *testing.T) {
+	v := vault{}
+	jsonString := `{ "secrets": [] }`
+	v.unmarshal(jsonString)
+
+	keys, _ := v.getKeys()
+	if len(keys) != 0 {
+		t.Errorf("Error empty vault, expected 0 elements, given %d", len(keys))
 	}
 }
