@@ -11,6 +11,10 @@ $ ./seraph
 # Follow interactive instructions
 ```
 
+## First POC example
+
+![POC Example](https://github.com/alainrk/seraph/raw/master/example/example.gif)
+
 # Usage [OLD]
 ```
 $ ./seraph -h
