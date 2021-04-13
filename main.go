@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -30,6 +29,21 @@ func promptForPassword(validate func(string) error) string {
 	return result
 }
 
+func promptForMode() (string, error) {
+	prompt := promptui.Select{
+		Label: "Select Mode",
+		Items: []string{"Encrypt", "Decrypt"},
+	}
+
+	_, mode, err := prompt.Run()
+
+	if err != nil {
+		return "", err
+	}
+
+	return mode, nil
+}
+
 func promptForText(label string) string {
 	prompt := promptui.Prompt{
 		Label: label,
@@ -46,30 +60,24 @@ func main() {
 	var ciphertext string
 	var deciphertext string
 
-	validate := func(s string) error {
-		if len(s) < 8 {
-			return errors.New("Too short passphrase")
-		}
-		return nil
-	}
-
-	passphrase = promptForPassword(validate)
-	key := hashPassphrase(passphrase)
-
-	prompt := promptui.Select{
-		Label: "Select Mode",
-		Items: []string{"Encrypt", "Decrypt"},
-	}
-
-	_, mode, err := prompt.Run()
+	mode, err := promptForMode()
 	check(err)
 
-	// Check secret file exists, create otherwise
+	var passwdValidator func(string) error
+	if mode == "Encrypt" {
+		passwdValidator = validatePassword
+	} else {
+		passwdValidator = validateAlwaysString
+	}
+
+	passphrase = promptForPassword(passwdValidator)
+	key := hashPassphrase(passphrase)
+
+	// Check if secret file exists, create otherwise
 	if _, err := os.Stat(SecretFile); err != nil {
 		f, err := os.Create(SecretFile)
+		defer f.Close()
 		check(err)
-		// close immediately here
-		f.Close()
 	}
 
 	if mode == "Encrypt" {
