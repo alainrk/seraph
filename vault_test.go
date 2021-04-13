@@ -51,6 +51,8 @@ func TestVaultMarshaling(t *testing.T) {
 	if given != expected {
 		t.Errorf("Marshal/Unmarshal test failed. Given = %s, Expected = %s", given, expected)
 	}
+
+	// fmt.Println(v.KeysMap)
 }
 
 func TestVaultOperations(t *testing.T) {
@@ -101,7 +103,9 @@ func TestVaultOperations(t *testing.T) {
 	if keys[2] != "Lorem" {
 		t.Errorf("Wrong keys sorting, Expected = %s, Given = %s", "Lorem", keys[2])
 	}
+
 	// fmt.Println("Keys:", strings.Join(keys, ", "))
+	// fmt.Println("KeysMap:", v.KeysMap)
 }
 
 func TestEmptyVault(t *testing.T) {

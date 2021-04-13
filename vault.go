@@ -6,7 +6,8 @@ import (
 )
 
 const (
-	notUnmarshaledError string = "vault is not unmarshaled"
+	notUnmarshaledError      string = "vault is not unmarshaled"
+	secretAlreadyExistsError string = "secret name already exists in the vault"
 )
 
 type llNode struct {
@@ -26,14 +27,22 @@ type secret struct {
 
 type vault struct {
 	__isUnmarshaled bool
+	KeysMap         map[string]bool
 	Secrets         []secret `json:"secrets"`
 }
 
+// Init function
 func (v *vault) unmarshal(jsonString string) {
 	json.Unmarshal([]byte(jsonString), v)
 	v.__isUnmarshaled = true
+
+	v.KeysMap = make(map[string]bool)
+	for _, secret := range v.Secrets {
+		v.KeysMap[secret.Name] = true
+	}
 }
 
+// Get the string out of the vault
 func (v vault) marshal() string {
 	x, _ := json.Marshal(v)
 	return string(x)
@@ -43,7 +52,11 @@ func (v *vault) add(s secret) error {
 	if !v.__isUnmarshaled {
 		return errors.New(notUnmarshaledError)
 	}
+	if v.KeysMap[s.Name] {
+		return errors.New(secretAlreadyExistsError)
+	}
 	v.Secrets = append(v.Secrets, s)
+	v.KeysMap[s.Name] = true
 	return nil
 }
 
@@ -54,6 +67,7 @@ func (v vault) len() (int, error) {
 	return len(v.Secrets), nil
 }
 
+// OLD Version, maybe useful in future
 // Returns all the keys (names) of the vault, alphabetical sorted
 func (v vault) getKeys() ([]string, error) {
 	l, err := v.len()
