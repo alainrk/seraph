@@ -1,9 +1,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/manifoldco/promptui"
 )
 
 const SecretFile = "assets/secret.nrk"
@@ -14,7 +17,80 @@ func check(e error) {
 	}
 }
 
+func promptForPassword(validate func(string) error) string {
+	prompt := promptui.Prompt{
+		Label:    "Passphrase",
+		Validate: validate,
+		Mask:     '*',
+	}
+
+	result, err := prompt.Run()
+	check(err)
+
+	return result
+}
+
+func promptForText(label string) string {
+	prompt := promptui.Prompt{
+		Label: label,
+	}
+
+	result, err := prompt.Run()
+	check(err)
+
+	return result
+}
+
 func main() {
+	var passphrase string
+	var ciphertext string
+	var deciphertext string
+
+	validate := func(s string) error {
+		if len(s) < 8 {
+			return errors.New("Too short passphrase")
+		}
+		return nil
+	}
+
+	passphrase = promptForPassword(validate)
+	key := hashPassphrase(passphrase)
+
+	prompt := promptui.Select{
+		Label: "Select Mode",
+		Items: []string{"Encrypt", "Decrypt"},
+	}
+
+	_, mode, err := prompt.Run()
+	check(err)
+
+	// Check secret file exists, create otherwise
+	if _, err := os.Stat(SecretFile); err != nil {
+		f, err := os.Create(SecretFile)
+		check(err)
+		// close immediately here
+		f.Close()
+	}
+
+	if mode == "Encrypt" {
+		plaintext := promptForText("Insert secret: ")
+		ciphertext = encrypt(key, plaintext)
+		err := ioutil.WriteFile(SecretFile, []byte(ciphertext), 0644)
+		check(err)
+		fmt.Printf("Encrypted file to %s\n", SecretFile)
+	}
+
+	if mode == "Decrypt" {
+		dat, err := ioutil.ReadFile(SecretFile)
+		check(err)
+		ciphertext = string(dat)
+		deciphertext = decrypt(key, ciphertext)
+		fmt.Printf("Decrypted: %s\n", deciphertext)
+	}
+}
+
+// OLD modality -> maybe to consider for non interactive mode
+func flagsHandling() {
 	flags := getFlags()
 	var passphrase string
 	var ciphertext string
