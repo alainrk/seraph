@@ -5,7 +5,13 @@
 Rewriting in go of an old secrets vault.
 Experimental. DON'T USE IT YET.
 
-# Usage
+# Usage [NEW]
+```
+$ ./seraph
+# Follow interactive instructions
+```
+
+# Usage [OLD]
 ```
 $ ./seraph -h
 
