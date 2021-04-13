@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -16,17 +17,15 @@ func check(e error) {
 	}
 }
 
-func promptForPassword(validate func(string) error) string {
+func promptForPassword(label string, validate func(string) error) (string, error) {
 	prompt := promptui.Prompt{
-		Label:    "Passphrase",
+		Label:    label,
 		Validate: validate,
 		Mask:     '*',
 	}
 
 	result, err := prompt.Run()
-	check(err)
-
-	return result
+	return result, err
 }
 
 func promptForMode() (string, error) {
@@ -63,24 +62,29 @@ func main() {
 	mode, err := promptForMode()
 	check(err)
 
-	var passwdValidator func(string) error
-	if mode == "Encrypt" {
-		passwdValidator = validatePassword
-	} else {
-		passwdValidator = validateAlwaysString
-	}
-
-	passphrase = promptForPassword(passwdValidator)
-	key := hashPassphrase(passphrase)
-
 	// Check if secret file exists, create otherwise
 	if _, err := os.Stat(SecretFile); err != nil {
 		f, err := os.Create(SecretFile)
-		defer f.Close()
 		check(err)
+		defer f.Close()
 	}
 
 	if mode == "Encrypt" {
+		passphrase, _ = promptForPassword("Password", validatePassword)
+		validatorConfirm := func(s string) error {
+			err := validatePassword(s)
+			if err != nil {
+				return err
+			}
+			if s != passphrase {
+				return errors.New(passwordsNotMatchingError)
+			}
+			return nil
+		}
+		_, _ = promptForPassword("Confirm", validatorConfirm)
+
+		key := hashPassphrase(passphrase)
+
 		plaintext := promptForText("Insert secret: ")
 		ciphertext = encrypt(key, plaintext)
 		err := ioutil.WriteFile(SecretFile, []byte(ciphertext), 0644)
@@ -92,7 +96,15 @@ func main() {
 		dat, err := ioutil.ReadFile(SecretFile)
 		check(err)
 		ciphertext = string(dat)
-		deciphertext = decrypt(key, ciphertext)
+
+		passphrase, _ = promptForPassword("Password", validatePassword)
+		key := hashPassphrase(passphrase)
+
+		deciphertext, err = decrypt(key, ciphertext)
+		if err != nil {
+			fmt.Println("Error decoding crypted data. Check your password.", err)
+			return
+		}
 		fmt.Printf("Decrypted: %s\n", deciphertext)
 	}
 }
@@ -132,7 +144,7 @@ func flagsHandling() {
 		dat, err := ioutil.ReadFile(SecretFile)
 		check(err)
 		ciphertext = string(dat)
-		deciphertext = decrypt(key, ciphertext)
+		deciphertext, _ = decrypt(key, ciphertext)
 		fmt.Printf("Decrypted: %s\n", deciphertext)
 	}
 

@@ -35,28 +35,28 @@ func encrypt(keyString string, plaintext string) string {
 	return fmt.Sprintf("%x", ciphertext)
 }
 
-func decrypt(keyString string, ciphertext string) string {
+func decrypt(keyString string, ciphertext string) (string, error) {
 	key, _ := hex.DecodeString(keyString)
 	enc, _ := hex.DecodeString(string(ciphertext))
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	aesGCM, err := cipher.NewGCM(block)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	nonceSize := aesGCM.NonceSize()
 	nonce, encrypted := enc[:nonceSize], enc[nonceSize:]
 	plaintext, err := aesGCM.Open(nil, nonce, encrypted, nil)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
-	return string(plaintext)
+	return string(plaintext), nil
 }
 
 func hashPassphrase(passphrase string) string {
