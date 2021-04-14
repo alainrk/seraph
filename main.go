@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 const (
@@ -103,15 +102,6 @@ func newVaultHandling() {
 	key := hashPassphrase(passphrase)
 
 	v := newVaultEmpty()
-	s := secret{}
-	s.Name = "Lorem"
-	s.Username = "ipsum"
-	s.Email = "dolor@s.it"
-	s.Password = "amet"
-	s.ApiKey = "0398509234"
-	s.Notes = "Test 1"
-	s.CreatedAt = time.Now().Format(dateTimeFormat)
-	v.add(s)
 
 	plaintext := v.marshal()
 	ciphertext := encrypt(key, plaintext)
