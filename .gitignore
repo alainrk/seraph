@@ -7,8 +7,8 @@
 
 # Runtime assets
 # exclude everything
-assets/*
-!assets/.gitkeep
+vaults/*
+!vaults/.gitkeep
 seraph
 
 # Test binary, built with `go test -c`
