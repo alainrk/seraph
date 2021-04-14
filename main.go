@@ -7,81 +7,18 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/manifoldco/promptui"
 )
 
-const vaultDirectory = "./vaults/"
-const SecretFile = "./vaults/secret.nrk"
+const (
+	vaultDirectory          = "./vaults/"
+	SecretFile              = "./vaults/secret.nrk"
+	vaultAlreadyExistsError = "vault already exists"
+)
 
 func check(e error) {
 	if e != nil {
 		panic(e)
 	}
-}
-
-func promptForPassword(label string, validate func(string) error) (string, error) {
-	prompt := promptui.Prompt{
-		Label:    label,
-		Validate: validate,
-		Mask:     '*',
-	}
-
-	result, err := prompt.Run()
-	return result, err
-}
-
-func promptForMode() (string, error) {
-	prompt := promptui.Select{
-		Label: "Select Mode",
-		Items: []string{"Encrypt", "Decrypt"},
-	}
-
-	_, mode, err := prompt.Run()
-
-	if err != nil {
-		return "", err
-	}
-
-	return mode, nil
-}
-
-func promptForStart() (string, error) {
-	prompt := promptui.Select{
-		Label: "Choose",
-		Items: []string{"Open Vault", "New Vault"},
-	}
-
-	_, mode, err := prompt.Run()
-
-	if err != nil {
-		return "", err
-	}
-
-	return mode, nil
-}
-
-func promptForText(label string) string {
-	prompt := promptui.Prompt{
-		Label: label,
-	}
-
-	result, err := prompt.Run()
-	check(err)
-
-	return result
-}
-
-func promptForVaults(vaults []string) string {
-	prompt := promptui.Select{
-		Label: "Choose",
-		Items: vaults,
-	}
-
-	_, result, err := prompt.Run()
-	check(err)
-
-	return result
 }
 
 func getVaults() []string {
@@ -103,28 +40,57 @@ func getVaults() []string {
 func main() {
 	var passphrase string
 	var ciphertext string
-	var deciphertext string
 
 	// TODO: Non-interactive handling
 	// flags := getFlags()
 
-	mode, _ := promptForStart()
-	vaults := getVaults()
+	_, mode, _ := promptForSelect("Choose", []string{"Open Vault", "New Vault"})
 
-	chosenVault := promptForVaults(vaults)
-	fmt.Println(chosenVault)
+	// Opening vault
+	if mode == "Open Vault" {
+		vaults := getVaults()
+		_, chosenVault, _ := promptForSelect("Choose", vaults)
 
-	mode, err := promptForMode()
-	check(err)
+		fmt.Println("Opening vault", chosenVault, "...")
 
-	// Check if secret file exists, create otherwise
-	if _, err := os.Stat(SecretFile); err != nil {
-		f, err := os.Create(SecretFile)
+		vaultPath := filepath.Join(vaultDirectory, chosenVault)
+
+		dat, _ := ioutil.ReadFile(vaultPath)
+		ciphertext = string(dat)
+
+		passphrase, _ = promptForPassword("Password", validatePassword)
+		key := hashPassphrase(passphrase)
+
+		deciphertext, err := decrypt(key, ciphertext)
+		if err != nil {
+			fmt.Println("Error decoding crypted data. Check your password.", err)
+			return
+		}
+		fmt.Printf("Decrypted: %s\n", deciphertext)
+		return
+	} else if mode == "New Vault" {
+		// Validate already exist vault
+		vaults := getVaults()
+		validatorVaultNotExists := func(s string) error {
+			for _, vault := range vaults {
+				if s+".vault" == vault {
+					return errors.New(vaultAlreadyExistsError)
+				}
+			}
+			return nil
+		}
+
+		newVaultName := promptForTextValid("Vault name", validatorVaultNotExists)
+		fmt.Println("new vault", newVaultName)
+
+		newVaultPath := filepath.Join(vaultDirectory, newVaultName+".vault")
+
+		// Create the vault
+		f, err := os.Create(newVaultPath)
 		check(err)
 		defer f.Close()
-	}
 
-	if mode == "Encrypt" {
+		// Init the vault's password
 		passphrase, _ = promptForPassword("Password", validatePassword)
 		validatorConfirm := func(s string) error {
 			err := validatePassword(s)
@@ -140,26 +106,10 @@ func main() {
 
 		key := hashPassphrase(passphrase)
 
-		plaintext := promptForText("Insert secret: ")
+		plaintext := promptForText("Insert secret")
 		ciphertext = encrypt(key, plaintext)
-		err := ioutil.WriteFile(SecretFile, []byte(ciphertext), 0644)
+		err = ioutil.WriteFile(newVaultPath, []byte(ciphertext), 0644)
 		check(err)
 		fmt.Printf("Encrypted file to %s\n", SecretFile)
-	}
-
-	if mode == "Decrypt" {
-		dat, err := ioutil.ReadFile(SecretFile)
-		check(err)
-		ciphertext = string(dat)
-
-		passphrase, _ = promptForPassword("Password", validatePassword)
-		key := hashPassphrase(passphrase)
-
-		deciphertext, err = decrypt(key, ciphertext)
-		if err != nil {
-			fmt.Println("Error decoding crypted data. Check your password.", err)
-			return
-		}
-		fmt.Printf("Decrypted: %s\n", deciphertext)
 	}
 }
