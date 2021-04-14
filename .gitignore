@@ -9,6 +9,7 @@
 # exclude everything
 assets/*
 !assets/.gitkeep
+seraph
 
 # Test binary, built with `go test -c`
 *.test
