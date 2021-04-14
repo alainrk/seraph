@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/manifoldco/promptui"
 )
 
-const SecretFile = "assets/secret.nrk"
+const vaultDirectory = "./vaults/"
+const SecretFile = "./vaults/secret.nrk"
 
 func check(e error) {
 	if e != nil {
@@ -43,6 +46,21 @@ func promptForMode() (string, error) {
 	return mode, nil
 }
 
+func promptForStart() (string, error) {
+	prompt := promptui.Select{
+		Label: "Choose",
+		Items: []string{"Open Vault", "New Vault"},
+	}
+
+	_, mode, err := prompt.Run()
+
+	if err != nil {
+		return "", err
+	}
+
+	return mode, nil
+}
+
 func promptForText(label string) string {
 	prompt := promptui.Prompt{
 		Label: label,
@@ -54,6 +72,34 @@ func promptForText(label string) string {
 	return result
 }
 
+func promptForVaults(vaults []string) string {
+	prompt := promptui.Select{
+		Label: "Choose",
+		Items: vaults,
+	}
+
+	_, result, err := prompt.Run()
+	check(err)
+
+	return result
+}
+
+func getVaults() []string {
+	var files []string
+
+	err := filepath.Walk(vaultDirectory, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() && !strings.HasPrefix(info.Name(), ".") {
+			files = append(files, info.Name())
+		}
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	return files
+}
+
 func main() {
 	var passphrase string
 	var ciphertext string
@@ -61,6 +107,12 @@ func main() {
 
 	// TODO: Non-interactive handling
 	// flags := getFlags()
+
+	mode, _ := promptForStart()
+	vaults := getVaults()
+
+	chosenVault := promptForVaults(vaults)
+	fmt.Println(chosenVault)
 
 	mode, err := promptForMode()
 	check(err)
