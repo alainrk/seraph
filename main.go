@@ -7,6 +7,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
+)
+
+const (
+	dateTimeFormat string = "2006-01-02T15:04:05-0700"
 )
 
 const (
@@ -37,79 +42,98 @@ func getVaults() []string {
 	return files
 }
 
-func main() {
-	var passphrase string
-	var ciphertext string
+func openVaultHandling() {
+	vaults := getVaults()
+	_, chosenVault, _ := promptForSelect("Choose", vaults)
 
+	fmt.Println("Opening vault", chosenVault, "...")
+
+	vaultPath := filepath.Join(vaultDirectory, chosenVault)
+
+	dat, _ := ioutil.ReadFile(vaultPath)
+	ciphertext := string(dat)
+
+	passphrase, _ := promptForPassword("Password", validatePassword)
+	key := hashPassphrase(passphrase)
+
+	deciphertext, err := decrypt(key, ciphertext)
+	if err != nil {
+		fmt.Println("Error decoding crypted data. Check your password.", err)
+		return
+	}
+	fmt.Printf("Decrypted: %s\n", deciphertext)
+}
+
+func newVaultHandling() {
+	// Validate already exist vault
+	vaults := getVaults()
+	validatorVaultNotExists := func(s string) error {
+		for _, vault := range vaults {
+			if s+".vault" == vault {
+				return errors.New(vaultAlreadyExistsError)
+			}
+		}
+		return nil
+	}
+
+	newVaultName := promptForTextValid("Vault name", validatorVaultNotExists)
+	fmt.Println("new vault", newVaultName)
+
+	newVaultPath := filepath.Join(vaultDirectory, newVaultName+".vault")
+
+	// Create the vault
+	f, err := os.Create(newVaultPath)
+	check(err)
+	defer f.Close()
+
+	// Init the vault's password
+	passphrase, _ := promptForPassword("Password", validatePassword)
+	validatorConfirm := func(s string) error {
+		err := validatePassword(s)
+		if err != nil {
+			return err
+		}
+		if s != passphrase {
+			return errors.New(passwordsNotMatchingError)
+		}
+		return nil
+	}
+	_, _ = promptForPassword("Confirm", validatorConfirm)
+
+	key := hashPassphrase(passphrase)
+
+	v := newVaultEmpty()
+	s := secret{}
+	s.Name = "Lorem"
+	s.Username = "ipsum"
+	s.Email = "dolor@s.it"
+	s.Password = "amet"
+	s.ApiKey = "0398509234"
+	s.Notes = "Test 1"
+	s.CreatedAt = time.Now().Format(dateTimeFormat)
+	v.add(s)
+
+	plaintext := v.marshal()
+	ciphertext := encrypt(key, plaintext)
+	err = ioutil.WriteFile(newVaultPath, []byte(ciphertext), 0644)
+	check(err)
+	fmt.Printf("Encrypted file to %s\n", SecretFile)
+}
+
+func main() {
 	// TODO: Non-interactive handling
 	// flags := getFlags()
 
-	_, mode, _ := promptForSelect("Choose", []string{"Open Vault", "New Vault"})
+	const (
+		openVault int = iota
+		newVault
+	)
+	index, _, _ := promptForSelect("Choose", []string{"Open Vault", "New Vault"})
 
 	// Opening vault
-	if mode == "Open Vault" {
-		vaults := getVaults()
-		_, chosenVault, _ := promptForSelect("Choose", vaults)
-
-		fmt.Println("Opening vault", chosenVault, "...")
-
-		vaultPath := filepath.Join(vaultDirectory, chosenVault)
-
-		dat, _ := ioutil.ReadFile(vaultPath)
-		ciphertext = string(dat)
-
-		passphrase, _ = promptForPassword("Password", validatePassword)
-		key := hashPassphrase(passphrase)
-
-		deciphertext, err := decrypt(key, ciphertext)
-		if err != nil {
-			fmt.Println("Error decoding crypted data. Check your password.", err)
-			return
-		}
-		fmt.Printf("Decrypted: %s\n", deciphertext)
-		return
-	} else if mode == "New Vault" {
-		// Validate already exist vault
-		vaults := getVaults()
-		validatorVaultNotExists := func(s string) error {
-			for _, vault := range vaults {
-				if s+".vault" == vault {
-					return errors.New(vaultAlreadyExistsError)
-				}
-			}
-			return nil
-		}
-
-		newVaultName := promptForTextValid("Vault name", validatorVaultNotExists)
-		fmt.Println("new vault", newVaultName)
-
-		newVaultPath := filepath.Join(vaultDirectory, newVaultName+".vault")
-
-		// Create the vault
-		f, err := os.Create(newVaultPath)
-		check(err)
-		defer f.Close()
-
-		// Init the vault's password
-		passphrase, _ = promptForPassword("Password", validatePassword)
-		validatorConfirm := func(s string) error {
-			err := validatePassword(s)
-			if err != nil {
-				return err
-			}
-			if s != passphrase {
-				return errors.New(passwordsNotMatchingError)
-			}
-			return nil
-		}
-		_, _ = promptForPassword("Confirm", validatorConfirm)
-
-		key := hashPassphrase(passphrase)
-
-		plaintext := promptForText("Insert secret")
-		ciphertext = encrypt(key, plaintext)
-		err = ioutil.WriteFile(newVaultPath, []byte(ciphertext), 0644)
-		check(err)
-		fmt.Printf("Encrypted file to %s\n", SecretFile)
+	if index == openVault {
+		openVaultHandling()
+	} else if index == newVault {
+		newVaultHandling()
 	}
 }

@@ -5,12 +5,8 @@ import (
 	"time"
 )
 
-const (
-	dateTimeFormat string = "2006-01-02T15:04:05-0700"
-)
-
 func TestVaultMarshaling(t *testing.T) {
-	v := vault{}
+	v := newVaultEmpty()
 
 	jsonString := `{
 		"secrets": [
@@ -43,7 +39,7 @@ func TestVaultMarshaling(t *testing.T) {
 	marshaled := v.marshal()
 	// fmt.Println("Marshaled:", marshaled)
 
-	unmarshaledVault := vault{}
+	unmarshaledVault := newVaultEmpty()
 	unmarshaledVault.unmarshal(marshaled)
 
 	given = v.Secrets[0].Password
@@ -56,7 +52,7 @@ func TestVaultMarshaling(t *testing.T) {
 }
 
 func TestVaultOperations(t *testing.T) {
-	v := vault{}
+	v := newVaultEmpty()
 	jsonString := `{ "secrets": [] }`
 	v.unmarshal(jsonString)
 
@@ -109,7 +105,7 @@ func TestVaultOperations(t *testing.T) {
 }
 
 func TestEmptyVault(t *testing.T) {
-	v := vault{}
+	v := newVaultEmpty()
 	jsonString := `{ "secrets": [] }`
 	v.unmarshal(jsonString)
 
