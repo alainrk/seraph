@@ -11,5 +11,6 @@ func TestEncryptDecrypt(t *testing.T) {
 	plaintext := "This is a test"
 	ciphertext := encrypt(key, plaintext)
 	deciphertext, _ := decrypt(key, ciphertext)
+
 	assert.Equal(t, plaintext, deciphertext, "they should be equal")
 }

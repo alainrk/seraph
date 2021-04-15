@@ -3,6 +3,8 @@ package main
 import (
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestVaultMarshaling(t *testing.T) {
@@ -16,39 +18,18 @@ func TestVaultMarshaling(t *testing.T) {
 	}`
 
 	v.unmarshal(jsonString)
-	// fmt.Println("Unmarshaled:", v)
 
-	given := v.Secrets[0].Name
-	expected := "GMAIL"
-	if given != expected {
-		t.Errorf("Wrong unmarshal. Given = %s, Expected = %s", given, expected)
-	}
+	assert.Equal(t, v.Secrets[0].Name, "GMAIL", "they should be equal")
 
-	given = v.Secrets[1].Email
-	expected = "test@email.com"
-	if given != expected {
-		t.Errorf("Wrong unmarshal. Given = %s, Expected = %s", given, expected)
-	}
+	assert.Equal(t, v.Secrets[1].Email, "test@email.com", "they should be equal")
 
-	given = v.Secrets[1].ApiKey
-	expected = ""
-	if given != expected {
-		t.Errorf("Wrong unmarshal. Given = %s, Expected = %s", given, expected)
-	}
+	assert.Equal(t, v.Secrets[1].ApiKey, "", "they should be equal")
 
 	marshaled := v.marshal()
-	// fmt.Println("Marshaled:", marshaled)
-
 	unmarshaledVault := newVaultEmpty()
 	unmarshaledVault.unmarshal(marshaled)
 
-	given = v.Secrets[0].Password
-	expected = unmarshaledVault.Secrets[0].Password
-	if given != expected {
-		t.Errorf("Marshal/Unmarshal test failed. Given = %s, Expected = %s", given, expected)
-	}
-
-	// fmt.Println(v.KeysMap)
+	assert.Equal(t, v.Secrets[0].Password, unmarshaledVault.Secrets[0].Password, "they should be equal")
 }
 
 func TestVaultOperations(t *testing.T) {
@@ -56,11 +37,8 @@ func TestVaultOperations(t *testing.T) {
 	jsonString := `{ "secrets": [] }`
 	v.unmarshal(jsonString)
 
-	given, _ := v.len()
-	var expected int = 0
-	if given != expected {
-		t.Errorf("Failed vault length retrieval. Given = %d, Expected = %d", given, expected)
-	}
+	len, _ := v.len()
+	assert.Equal(t, len, 0, "they should be equal")
 
 	s := secret{}
 	s.Name = "Lorem"
@@ -76,14 +54,8 @@ func TestVaultOperations(t *testing.T) {
 	s.Username = "Different item from the previous one"
 	v.add(s)
 
-	// fmt.Println("Insert secret:", s)
-	// fmt.Println(v)
-
-	given, _ = v.len()
-	expected = 2
-	if given != expected {
-		t.Errorf("Failed vault length retrieval after adding. Given = %d, Expected = %d", given, expected)
-	}
+	len, _ = v.len()
+	assert.Equal(t, len, 2, "they should be equal")
 
 	s.Name = "AKey number one"
 	v.add(s)
@@ -92,16 +64,10 @@ func TestVaultOperations(t *testing.T) {
 	s.Name = "Ze kous nomiro dri"
 	v.add(s)
 	keys, err := v.getKeys()
-	if err != nil {
-		t.Errorf("Error getting vault keys, Error = %s", err)
-	}
 
-	if keys[2] != "Lorem" {
-		t.Errorf("Wrong keys sorting, Expected = %s, Given = %s", "Lorem", keys[2])
-	}
+	assert.Nil(t, err)
 
-	// fmt.Println("Keys:", strings.Join(keys, ", "))
-	// fmt.Println("KeysMap:", v.KeysMap)
+	assert.Equal(t, keys[2], "Lorem", "they should be different")
 }
 
 func TestEmptyVault(t *testing.T) {
