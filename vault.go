@@ -26,16 +26,16 @@ type secret struct {
 }
 
 type vault struct {
-	KeysMap map[string]bool
-	Secrets []secret `json:"secrets"`
+	KeysMap map[string]secret // O(1) runtime mapping
+	Secrets []secret          `json:"secrets"`
 }
 
 func (v *vault) unmarshal(jsonString string) {
 	json.Unmarshal([]byte(jsonString), v)
 
-	v.KeysMap = make(map[string]bool)
+	v.KeysMap = make(map[string]secret)
 	for _, secret := range v.Secrets {
-		v.KeysMap[secret.Name] = true
+		v.KeysMap[secret.Name] = secret
 	}
 }
 
@@ -46,14 +46,14 @@ func (v vault) marshal() string {
 }
 
 func (v *vault) add(s secret) error {
-	if v.KeysMap[s.Name] {
+	if _, ok := v.KeysMap[s.Name]; ok {
 		return errors.New(secretAlreadyExistsError)
 	}
 	if v.Secrets == nil {
 		v.Secrets = make([]secret, 1)
 	}
 	v.Secrets = append(v.Secrets, s)
-	v.KeysMap[s.Name] = true
+	v.KeysMap[s.Name] = s
 	return nil
 }
 
@@ -106,6 +106,6 @@ func (v vault) getKeys() ([]string, error) {
 // Constructors
 
 func newVaultEmpty() *vault {
-	v := vault{map[string]bool{}, make([]secret, 0)}
+	v := vault{map[string]secret{}, make([]secret, 0)}
 	return &v
 }
