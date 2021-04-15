@@ -2,6 +2,8 @@ package main
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEncryptDecrypt(t *testing.T) {
@@ -9,8 +11,5 @@ func TestEncryptDecrypt(t *testing.T) {
 	plaintext := "This is a test"
 	ciphertext := encrypt(key, plaintext)
 	deciphertext, _ := decrypt(key, ciphertext)
-
-	if deciphertext != plaintext {
-		t.Errorf("Error on crypt/decrypt. Expected \"%s\", given \"%s\"", plaintext, deciphertext)
-	}
+	assert.Equal(t, plaintext, deciphertext, "they should be equal")
 }
