@@ -56,17 +56,45 @@ func chooseVault(ctx *Context) error {
 }
 
 func insertSecretHandling(ctx *Context) {
-	// TODO Test
+	var choice string
+	var value string
+	changed := false
+
+	fields := []string{"Exit", "Name", "Username", "Email", "Password", "ApiKey", "Notes"}
 	s := secret{}
-	s.Name = "Lorem"
-	s.Username = "ipsum"
-	s.Email = "dolor@s.it"
-	s.Password = "amet"
-	s.ApiKey = "0398509234"
-	s.Notes = "Test 1"
+
+	for {
+		_, choice, _ = promptForSelect("Choose a field to edit or exit", fields)
+		if choice == "Exit" {
+			break
+		}
+		changed = true
+		value, _ = promptForText(choice)
+		switch choice {
+		case "Name":
+			s.Name = value
+		case "Username":
+			s.Username = value
+		case "Email":
+			s.Email = value
+		case "Password":
+			s.Password = value
+		case "ApiKey":
+			s.ApiKey = value
+		case "Notes":
+			s.Notes = value
+		}
+	}
+
+	if !changed {
+		return
+	}
+
 	s.CreatedAt = time.Now().Format(dateTimeFormat)
 	s.UpdatedAt = time.Now().Format(dateTimeFormat)
+
 	ctx.vault.add(s)
+	saveVault(ctx, true)
 }
 
 func getSecretHandling(ctx *Context) {
@@ -123,10 +151,17 @@ func newVaultHandling(ctx *Context) {
 	v.path = newVaultPath
 	ctx.vault = v
 
-	saveVault(ctx)
+	saveVault(ctx, false)
 }
 
-func saveVault(ctx *Context) {
+func saveVault(ctx *Context, askConfirm bool) {
+	if askConfirm {
+		confirm, _ := promptForConfirm("Save")
+		if confirm == false {
+			fmt.Println("Changes not saved")
+			return
+		}
+	}
 	marshaledPlainText := ctx.vault.marshal()
 	marshaledCipherText := encrypt(ctx.hashedPassword, marshaledPlainText)
 	err := ioutil.WriteFile(ctx.vault.path, []byte(marshaledCipherText), 0644)

@@ -24,42 +24,56 @@ type Context struct {
 }
 
 func main() {
-	ctx := &Context{}
+	var ctx *Context
+
 	// TODO: Non-interactive handling
 	// flags := getFlags()
 
 	// Step 0
 	const (
-		openVault int = iota
+		exit int = iota
+		openVault
 		newVault
 		testVault
 	)
 
 	// Step 1
 	const (
-		getSecret int = iota
+		back int = iota
+		getSecret
 		insertSecret
 	)
 
-	index, _, _ := promptForSelect("Choose", []string{"Open Vault", "New Vault", "TEST-PrintVault"})
+	for {
+		index, _, _ := promptForSelect("Choose", []string{"Exit", "Open Vault", "New Vault", "TEST-PrintVault"})
 
-	// TODO: Removeme
-	if index == testVault {
-		chooseVault(ctx)
-		fmt.Println(ctx.vault.marshal())
-	}
-
-	// Opening vault
-	if index == openVault {
-		chooseVault(ctx)
-		index, _, _ = promptForSelect("Choose", []string{"Get secret", "Insert secret"})
-		// fmt.Println(ctx.vault.marshal())
-		if index == insertSecret {
-			insertSecretHandling(ctx)
-		} else if index == getSecret {
-			getSecretHandling(ctx)
+		if index == exit {
+			return
 		}
-	} else if index == newVault {
-		newVaultHandling(ctx)
+
+		// Re-init at every cycle
+		ctx = &Context{}
+
+		// TEST - Removeme
+		if index == testVault {
+			chooseVault(ctx)
+			fmt.Println(ctx.vault.marshal())
+		}
+
+		if index == openVault {
+			// Opening existing vault
+			chooseVault(ctx)
+
+			index, _, _ = promptForSelect("Choose", []string{"Back", "Get secret", "Insert secret"})
+
+			if index == insertSecret {
+				insertSecretHandling(ctx)
+			} else if index == getSecret {
+				getSecretHandling(ctx)
+			}
+		} else if index == newVault {
+			// Create new vault
+			newVaultHandling(ctx)
+		}
 	}
 }

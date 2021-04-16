@@ -1,16 +1,20 @@
 package main
 
-import "github.com/manifoldco/promptui"
+import (
+	"github.com/manifoldco/promptui"
+)
 
-func promptForText(label string) string {
+func promptForText(label string) (string, error) {
 	prompt := promptui.Prompt{
 		Label: label,
 	}
 
 	result, err := prompt.Run()
-	check(err)
+	if err != nil {
+		return "", err
+	}
 
-	return result
+	return result, nil
 }
 
 func promptForTextValid(label string, validate func(string) error) string {
@@ -49,4 +53,19 @@ func promptForSelect(label string, choices []string) (int, string, error) {
 	}
 
 	return index, mode, nil
+}
+
+func promptForConfirm(label string) (bool, error) {
+	prompt := promptui.Prompt{
+		Label:     label,
+		IsConfirm: true,
+	}
+
+	result, err := prompt.Run()
+
+	if err != nil {
+		return false, nil
+	}
+
+	return result == "y", nil
 }
