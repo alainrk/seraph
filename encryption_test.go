@@ -7,7 +7,7 @@ import (
 )
 
 func TestEncryptDecrypt(t *testing.T) {
-	key := hashPassphrase("passphrase")
+	key := hashPassword("password")
 	plaintext := "This is a test"
 	ciphertext := encrypt(key, plaintext)
 	deciphertext, _ := decrypt(key, ciphertext)

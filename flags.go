@@ -9,7 +9,7 @@ import (
 )
 
 type flags struct {
-	passphrase  string
+	password    string
 	encryptMode bool
 	decryptMode bool
 }
@@ -45,11 +45,11 @@ func prompt(output string) string {
 func getFlags() (flagsObject *flags) {
 	var encryptFlag bool
 	var decryptFlag bool
-	var passphraseFlag stringFlag
+	var passwordFlag stringFlag
 
 	flag.BoolVar(&encryptFlag, "e", false, "encrypt mode")
 	flag.BoolVar(&decryptFlag, "d", false, "decrypt mode")
-	flag.Var(&passphraseFlag, "p", "passphrase [INSECURE method, use interactive mode instead]")
+	flag.Var(&passwordFlag, "p", "password [INSECURE method, use interactive mode instead]")
 
 	flag.Parse()
 
@@ -72,13 +72,13 @@ func getFlags() (flagsObject *flags) {
 		flagsObject.decryptMode = true
 	}
 
-	if !passphraseFlag.set {
-		// passphrase not given
-	} else if passphraseFlag.value == "" {
-		fmt.Println("Flag [-p] needs a string (passphrase) argument")
+	if !passwordFlag.set {
+		// password not given
+	} else if passwordFlag.value == "" {
+		fmt.Println("Flag [-p] needs a string (password) argument")
 		os.Exit(1)
 	} else {
-		flagsObject.passphrase = passphraseFlag.value
+		flagsObject.password = passwordFlag.value
 	}
 
 	return flagsObject

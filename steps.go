@@ -26,32 +26,36 @@ func getVaults() []string {
 	return files
 }
 
-func chooseVault() (*vault, error) {
+func chooseVault(ctx Context) error {
 	vaults := getVaults()
-	_, chosenVault, _ := promptForSelect("Choose", vaults)
+	_, vaultName, _ := promptForSelect("Choose", vaults)
 
-	fmt.Println("Opening vault", chosenVault, "...")
+	fmt.Println("Opening vault", vaultName, "...")
 
-	vaultPath := filepath.Join(vaultDirectory, chosenVault)
+	vaultPath := filepath.Join(vaultDirectory, vaultName)
 
 	dat, _ := ioutil.ReadFile(vaultPath)
 	ciphertext := string(dat)
 
-	passphrase, _ := promptForPassword("Password", validatePassword)
-	key := hashPassphrase(passphrase)
+	password, _ := promptForPassword("Password", validatePassword)
+	ctx.hashedPassword = hashPassword(password)
 
-	vaultMarshaled, err := decrypt(key, ciphertext)
+	vaultMarshaled, err := decrypt(ctx.hashedPassword, ciphertext)
 	if err != nil {
 		fmt.Println("Error decoding crypted data. Check your password.", err)
-		return nil, err
+		return err
 	}
 
 	vault := newVaultEmpty()
+	vault.name = vaultName
+	vault.path = vaultPath
 	vault.unmarshal(vaultMarshaled)
-	return vault, nil
+
+	ctx.vault = vault
+	return nil
 }
 
-func insertSecretHandling(vault vault) {
+func insertSecretHandling(ctx Context) {
 	// TODO Test
 	s := secret{}
 	s.Name = "Lorem"
@@ -61,29 +65,23 @@ func insertSecretHandling(vault vault) {
 	s.ApiKey = "0398509234"
 	s.Notes = "Test 1"
 	s.CreatedAt = time.Now().Format(dateTimeFormat)
-	vault.add(s)
+	ctx.vault.add(s)
 
-	// TODO --- I need a context, created at main that's been passed around
-	// I need to keep the password in some way and other data
-	//
-	// marshaled := vault.marshal()
-	// ciphertext := encrypt(key, marshaled)
-	// err = ioutil.WriteFile(newVaultPath, []byte(ciphertext), 0644)
-	// check(err)
-	// fmt.Printf("Encrypted file to %s\n", SecretFile)
+	// Wanna marshal here already? Or maybe wait for save? Or ask the user?
+	saveVault(ctx)
 }
 
-func getSecretHandling(vault vault) {
+func getSecretHandling(ctx Context) {
 	keys := make([]string, 0)
-	for k, _ := range vault.KeysMap {
+	for k, _ := range ctx.vault.KeysMap {
 		keys = append(keys, k)
 	}
 
 	_, key, _ := promptForSelect("Choose", keys)
-	fmt.Println(vault.KeysMap[key])
+	fmt.Println(ctx.vault.KeysMap[key])
 }
 
-func newVaultHandling() {
+func newVaultHandling(ctx Context) {
 	// Validate already exist vault
 	vaults := getVaults()
 	validatorVaultNotExists := func(s string) error {
@@ -96,9 +94,10 @@ func newVaultHandling() {
 	}
 
 	newVaultName := promptForTextValid("Vault name", validatorVaultNotExists)
+	newVaultName = newVaultName + ".vault"
 	fmt.Println("new vault", newVaultName)
 
-	newVaultPath := filepath.Join(vaultDirectory, newVaultName+".vault")
+	newVaultPath := filepath.Join(vaultDirectory, newVaultName)
 
 	// Create the vault
 	f, err := os.Create(newVaultPath)
@@ -106,26 +105,33 @@ func newVaultHandling() {
 	defer f.Close()
 
 	// Init the vault's password
-	passphrase, _ := promptForPassword("Password", validatePassword)
+	password, _ := promptForPassword("Password", validatePassword)
 	validatorConfirm := func(s string) error {
 		err := validatePassword(s)
 		if err != nil {
 			return err
 		}
-		if s != passphrase {
+		if s != password {
 			return errors.New(passwordsNotMatchingError)
 		}
 		return nil
 	}
 	_, _ = promptForPassword("Confirm", validatorConfirm)
 
-	key := hashPassphrase(passphrase)
+	ctx.hashedPassword = hashPassword(password)
 
 	v := newVaultEmpty()
+	v.name = newVaultName
+	v.path = newVaultPath
 
-	plaintext := v.marshal()
-	ciphertext := encrypt(key, plaintext)
-	err = ioutil.WriteFile(newVaultPath, []byte(ciphertext), 0644)
+	ctx.vault = v
+	saveVault(ctx)
+}
+
+func saveVault(ctx Context) {
+	marshaledPlainText := ctx.vault.marshal()
+	marshaledCipherText := encrypt(ctx.hashedPassword, marshaledPlainText)
+	err := ioutil.WriteFile(ctx.vault.path, []byte(marshaledCipherText), 0644)
 	check(err)
-	fmt.Printf("Encrypted file to %s\n", SecretFile)
+	fmt.Printf("Encrypted file to %s\n", ctx.vault.path)
 }

@@ -6,7 +6,6 @@ const (
 
 const (
 	vaultDirectory          = "./vaults/"
-	SecretFile              = "./vaults/secret.nrk"
 	vaultAlreadyExistsError = "vault already exists"
 )
 
@@ -16,7 +15,14 @@ func check(e error) {
 	}
 }
 
+type Context struct {
+	hashedPassword string
+	vault          *vault
+	currentStep    string
+}
+
 func main() {
+	ctx := Context{}
 	// TODO: Non-interactive handling
 	// flags := getFlags()
 
@@ -36,14 +42,14 @@ func main() {
 
 	// Opening vault
 	if index == openVault {
-		vault, _ := chooseVault()
+		chooseVault(ctx)
 		index, _, _ = promptForSelect("Choose", []string{"Get secret", "Insert secret"})
 		if index == insertSecret {
-			getSecretHandling(*vault)
+			getSecretHandling(ctx)
 		} else if index == getSecret {
-			insertSecretHandling(*vault)
+			insertSecretHandling(ctx)
 		}
 	} else if index == newVault {
-		newVaultHandling()
+		newVaultHandling(ctx)
 	}
 }

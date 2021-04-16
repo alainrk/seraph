@@ -26,6 +26,8 @@ type secret struct {
 }
 
 type vault struct {
+	name    string
+	path    string
 	KeysMap map[string]secret // O(1) runtime mapping
 	Secrets []secret          `json:"secrets"`
 }
@@ -106,6 +108,6 @@ func (v vault) getKeys() ([]string, error) {
 // Constructors
 
 func newVaultEmpty() *vault {
-	v := vault{map[string]secret{}, make([]secret, 0)}
+	v := vault{"", "", map[string]secret{}, make([]secret, 0)}
 	return &v
 }

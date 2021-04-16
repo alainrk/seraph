@@ -24,7 +24,7 @@ Usage of ./seraph:
   -d    decrypt mode
   -e    encrypt mode
   -p value
-        passphrase [INSECURE method, use interactive mode instead]
+        password [INSECURE method, use interactive mode instead]
 ```
 
 # Dev

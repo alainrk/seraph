@@ -59,8 +59,8 @@ func decrypt(keyString string, ciphertext string) (string, error) {
 	return string(plaintext), nil
 }
 
-func hashPassphrase(passphrase string) string {
-	keyBytes := sha256.Sum256([]byte(passphrase))
+func hashPassword(password string) string {
+	keyBytes := sha256.Sum256([]byte(password))
 	key := hex.EncodeToString(keyBytes[:])
 	return key
 }
