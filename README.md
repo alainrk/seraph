@@ -14,7 +14,11 @@ $ ./seraph
 
 ## First POC example
 
-![POC Example](https://github.com/alainrk/seraph/raw/master/example/example.gif)
+![ScreenExample02](https://github.com/alainrk/seraph/raw/master/example/02.png)
+![ScreenExample03](https://github.com/alainrk/seraph/raw/master/example/03.png)
+![ScreenExample04](https://github.com/alainrk/seraph/raw/master/example/04.png)
+![ScreenExample05](https://github.com/alainrk/seraph/raw/master/example/05.png)
+![ScreenExample06](https://github.com/alainrk/seraph/raw/master/example/06.png)
 
 # Usage [OLD]
 ```
