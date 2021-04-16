@@ -38,7 +38,8 @@ func main() {
 	)
 
 	for {
-		index, _, _ := promptForSelect("Choose", []string{"Exit", "Open Vault", "New Vault", "TEST-PrintVault"})
+		// index, _, _ := promptForSelect("Choose", []string{"Exit", "Open Vault", "New Vault", "TEST-PrintVault"})
+		index, _, _ := promptForSelect("Choose", []string{"Exit", "Open Vault", "New Vault"})
 
 		if index == exit {
 			return

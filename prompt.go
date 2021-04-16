@@ -1,6 +1,10 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
+	"os"
+
 	"github.com/manifoldco/promptui"
 )
 
@@ -68,4 +72,10 @@ func promptForConfirm(label string) (bool, error) {
 	}
 
 	return result == "y", nil
+}
+
+func promptToJustWait() {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Press [enter]")
+	reader.ReadString('\n')
 }

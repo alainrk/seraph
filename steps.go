@@ -125,7 +125,15 @@ func getSecretHandling(ctx *Context) {
 	}
 
 	_, key, _ := promptForSelect("Choose", keys)
-	fmt.Println(ctx.vault.KeysMap[key])
+
+	fmt.Println("\nName:", ctx.vault.KeysMap[key].Name)
+	fmt.Println("Username:", ctx.vault.KeysMap[key].Username)
+	fmt.Println("Email:", ctx.vault.KeysMap[key].Email)
+	fmt.Println("Password:", ctx.vault.KeysMap[key].Password)
+	fmt.Println("ApiKey:", ctx.vault.KeysMap[key].ApiKey)
+	fmt.Println("Notes:", ctx.vault.KeysMap[key].Notes+"\n")
+
+	promptToJustWait()
 }
 
 func newVaultHandling(ctx *Context) {
