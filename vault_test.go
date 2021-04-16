@@ -12,8 +12,8 @@ func TestVaultMarshaling(t *testing.T) {
 
 	jsonString := `{
 		"secrets": [
-			{ "name": "GMAIL", "email": "test@email.com", "username": "alainrk", "password": "foobar", "apiKey": "3894H8ETW", "notes": "This is a secret", "createdAt": "2016-01-12T20:04:05-0700" },
-			{ "name": "JIRA", "email": "test@email.com", "username": "jita", "password": "batterystaple", "apiKey": null, "notes": "Jira secret go on", "createdAt": "2020-02-19T15:12:05-0700" }
+			{ "name": "GMAIL", "email": "test@email.com", "username": "alainrk", "password": "foobar", "apiKey": "3894H8ETW", "notes": "This is a secret", "createdAt": "2016-01-12T20:04:05-0700", "updatedAt": "2020-02-19T15:12:05-0700" },
+			{ "name": "JIRA", "email": "test@email.com", "username": "jita", "password": "batterystaple", "apiKey": null, "notes": "Jira secret go on", "createdAt": "2020-02-19T15:12:05-0700", "updatedAt": "2020-02-19T15:12:05-0700" }
 		]
 	}`
 
@@ -48,6 +48,7 @@ func TestVaultOperations(t *testing.T) {
 	s.ApiKey = "0398509234"
 	s.Notes = "Test 1"
 	s.CreatedAt = time.Now().Format(dateTimeFormat)
+	s.UpdatedAt = time.Now().Format(dateTimeFormat)
 	v.add(s)
 
 	s.Name = "This is another"

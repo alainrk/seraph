@@ -65,6 +65,7 @@ func insertSecretHandling(ctx *Context) {
 	s.ApiKey = "0398509234"
 	s.Notes = "Test 1"
 	s.CreatedAt = time.Now().Format(dateTimeFormat)
+	s.UpdatedAt = time.Now().Format(dateTimeFormat)
 	ctx.vault.add(s)
 }
 

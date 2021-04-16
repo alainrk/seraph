@@ -37,16 +37,15 @@ func main() {
 
 	// Step 1
 	const (
-		insertSecret int = iota
-		getSecret
+		getSecret int = iota
+		insertSecret
 	)
 
 	index, _, _ := promptForSelect("Choose", []string{"Open Vault", "New Vault", "TEST-PrintVault"})
 
+	// TODO: Removeme
 	if index == testVault {
-		fmt.Println("TEST MAIN 1", ctx, ctx.vault)
 		chooseVault(ctx)
-		fmt.Println("TEST MAIN 2", ctx, ctx.vault)
 		fmt.Println(ctx.vault.marshal())
 	}
 
@@ -54,11 +53,11 @@ func main() {
 	if index == openVault {
 		chooseVault(ctx)
 		index, _, _ = promptForSelect("Choose", []string{"Get secret", "Insert secret"})
-		fmt.Println(ctx.vault.marshal())
+		// fmt.Println(ctx.vault.marshal())
 		if index == insertSecret {
-			getSecretHandling(ctx)
-		} else if index == getSecret {
 			insertSecretHandling(ctx)
+		} else if index == getSecret {
+			getSecretHandling(ctx)
 		}
 	} else if index == newVault {
 		newVaultHandling(ctx)

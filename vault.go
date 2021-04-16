@@ -23,6 +23,7 @@ type secret struct {
 	ApiKey    string `json:"apiKey"`
 	Notes     string `json:"notes"`
 	CreatedAt string `json:"createdAt"` // [GO= 2006-01-02T15:04:05-0700] [Java= yyyy-MM-dd'T'HH:mm:ssZ]	[C= %FT%T%z] ISO 8601
+	UpdatedAt string `json:"updatedAt"` // [GO= 2006-01-02T15:04:05-0700] [Java= yyyy-MM-dd'T'HH:mm:ssZ]	[C= %FT%T%z] ISO 8601
 }
 
 type vault struct {
