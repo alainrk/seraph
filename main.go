@@ -37,13 +37,6 @@ func main() {
 		testVault
 	)
 
-	// Step 1
-	const (
-		back int = iota
-		getSecret
-		insertSecret
-	)
-
 	for {
 		index, _, _ := promptForSelect("Choose", []string{"Exit", "Open Vault", "New Vault", "TEST-PrintVault"})
 
@@ -63,14 +56,7 @@ func main() {
 		if index == openVault {
 			// Opening existing vault
 			chooseVault(ctx)
-
-			index, _, _ = promptForSelect("Choose", []string{"Back", "Get secret", "Insert secret"})
-
-			if index == insertSecret {
-				insertSecretHandling(ctx)
-			} else if index == getSecret {
-				getSecretHandling(ctx)
-			}
+			openedVaultHandling(ctx)
 		} else if index == newVault {
 			// Create new vault
 			newVaultHandling(ctx)

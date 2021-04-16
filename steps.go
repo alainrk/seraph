@@ -10,6 +10,13 @@ import (
 	"time"
 )
 
+// Step 1
+const (
+	back int = iota
+	getSecret
+	insertSecret
+)
+
 func getVaults() []string {
 	var files []string
 
@@ -53,6 +60,20 @@ func chooseVault(ctx *Context) error {
 
 	ctx.vault = vault
 	return nil
+}
+
+func openedVaultHandling(ctx *Context) {
+	for {
+		index, _, _ := promptForSelect("Choose", []string{"Back", "Get secret", "Insert secret"})
+
+		if index == back {
+			return
+		} else if index == insertSecret {
+			insertSecretHandling(ctx)
+		} else if index == getSecret {
+			getSecretHandling(ctx)
+		}
+	}
 }
 
 func insertSecretHandling(ctx *Context) {
