@@ -26,7 +26,7 @@ func getVaults() []string {
 	return files
 }
 
-func chooseVault(ctx Context) error {
+func chooseVault(ctx *Context) error {
 	vaults := getVaults()
 	_, vaultName, _ := promptForSelect("Choose", vaults)
 
@@ -55,7 +55,7 @@ func chooseVault(ctx Context) error {
 	return nil
 }
 
-func insertSecretHandling(ctx Context) {
+func insertSecretHandling(ctx *Context) {
 	// TODO Test
 	s := secret{}
 	s.Name = "Lorem"
@@ -66,12 +66,9 @@ func insertSecretHandling(ctx Context) {
 	s.Notes = "Test 1"
 	s.CreatedAt = time.Now().Format(dateTimeFormat)
 	ctx.vault.add(s)
-
-	// Wanna marshal here already? Or maybe wait for save? Or ask the user?
-	saveVault(ctx)
 }
 
-func getSecretHandling(ctx Context) {
+func getSecretHandling(ctx *Context) {
 	keys := make([]string, 0)
 	for k, _ := range ctx.vault.KeysMap {
 		keys = append(keys, k)
@@ -81,7 +78,7 @@ func getSecretHandling(ctx Context) {
 	fmt.Println(ctx.vault.KeysMap[key])
 }
 
-func newVaultHandling(ctx Context) {
+func newVaultHandling(ctx *Context) {
 	// Validate already exist vault
 	vaults := getVaults()
 	validatorVaultNotExists := func(s string) error {
@@ -123,12 +120,12 @@ func newVaultHandling(ctx Context) {
 	v := newVaultEmpty()
 	v.name = newVaultName
 	v.path = newVaultPath
-
 	ctx.vault = v
+
 	saveVault(ctx)
 }
 
-func saveVault(ctx Context) {
+func saveVault(ctx *Context) {
 	marshaledPlainText := ctx.vault.marshal()
 	marshaledCipherText := encrypt(ctx.hashedPassword, marshaledPlainText)
 	err := ioutil.WriteFile(ctx.vault.path, []byte(marshaledCipherText), 0644)

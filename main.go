@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 const (
 	dateTimeFormat string = "2006-01-02T15:04:05-0700"
 )
@@ -22,7 +24,7 @@ type Context struct {
 }
 
 func main() {
-	ctx := Context{}
+	ctx := &Context{}
 	// TODO: Non-interactive handling
 	// flags := getFlags()
 
@@ -30,6 +32,7 @@ func main() {
 	const (
 		openVault int = iota
 		newVault
+		testVault
 	)
 
 	// Step 1
@@ -38,12 +41,20 @@ func main() {
 		getSecret
 	)
 
-	index, _, _ := promptForSelect("Choose", []string{"Open Vault", "New Vault"})
+	index, _, _ := promptForSelect("Choose", []string{"Open Vault", "New Vault", "TEST-PrintVault"})
+
+	if index == testVault {
+		fmt.Println("TEST MAIN 1", ctx, ctx.vault)
+		chooseVault(ctx)
+		fmt.Println("TEST MAIN 2", ctx, ctx.vault)
+		fmt.Println(ctx.vault.marshal())
+	}
 
 	// Opening vault
 	if index == openVault {
 		chooseVault(ctx)
 		index, _, _ = promptForSelect("Choose", []string{"Get secret", "Insert secret"})
+		fmt.Println(ctx.vault.marshal())
 		if index == insertSecret {
 			getSecretHandling(ctx)
 		} else if index == getSecret {
