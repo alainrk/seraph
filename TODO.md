@@ -1,10 +1,10 @@
 # Random things wondering to do
 
 ## High priority
-- edit secret
 
 ## Medium priority
 - handle a bak file to avoid corrupted saving?
+- preview editing value
 
 ## Low priority
 - custom fields?
@@ -21,3 +21,4 @@
 - [getSecret] there has to be a any-key waiting press to keep the results on the screen and on key press user can get back to menu
 - getSecret step => if no keys have to go back automatically
 - handle unique name => now same name overrides the previous one
+- edit secret

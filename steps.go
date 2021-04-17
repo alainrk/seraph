@@ -15,6 +15,7 @@ const (
 	back int = iota
 	getSecret
 	insertSecret
+	editSecret
 )
 
 func getVaults() []string {
@@ -82,7 +83,7 @@ func chooseVault(app *Context) error {
 
 func openedVaultHandling(app *Context) {
 	for {
-		index, _, _ := promptForSelect("Choose", []string{"Back", "Get secret", "Insert secret"})
+		index, _, _ := promptForSelect("Choose", []string{"Back", "Get secret", "Insert secret", "Edit secret"})
 
 		if index == back {
 			return
@@ -90,6 +91,8 @@ func openedVaultHandling(app *Context) {
 			insertSecretHandling(app)
 		} else if index == getSecret {
 			getSecretHandling(app)
+		} else if index == editSecret {
+			editSecretHandling(app)
 		}
 	}
 }
@@ -149,6 +152,63 @@ func insertSecretHandling(app *Context) {
 	s.UpdatedAt = time.Now().Format(dateTimeFormat)
 
 	app.vault.add(s)
+	saveVault(app, true)
+	clearScreen()
+}
+
+func editSecretHandling(app *Context) {
+	var choice string
+	var value string
+	changed := false
+
+	keys := make([]string, 0)
+	for k, _ := range app.vault.KeysMap {
+		keys = append(keys, k)
+	}
+
+	if len(keys) == 0 {
+		fmt.Println("No items in this vault")
+		promptToJustWait()
+		clearScreen()
+		return
+	}
+
+	_, key, _ := promptForSelect("Choose", keys)
+
+	s := app.vault.KeysMap[key]
+	fields := []string{"Exit/Save", "Username", "Email", "Password", "ApiKey", "Notes"}
+
+	for {
+		_, choice, _ = promptForSelect("Choose a field to edit or exit", fields)
+		if choice == "Exit/Save" {
+			break
+		}
+		value, _ = promptForText(choice)
+		switch choice {
+		case "Username":
+			s.Username = value
+			changed = true
+		case "Email":
+			s.Email = value
+			changed = true
+		case "Password":
+			s.Password = value
+			changed = true
+		case "ApiKey":
+			s.ApiKey = value
+			changed = true
+		case "Notes":
+			s.Notes = value
+			changed = true
+		}
+	}
+
+	if !changed {
+		return
+	}
+
+	s.UpdatedAt = time.Now().Format(dateTimeFormat)
+
 	saveVault(app, true)
 	clearScreen()
 }

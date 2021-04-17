@@ -29,16 +29,16 @@ type secret struct {
 type vault struct {
 	name    string
 	path    string
-	KeysMap map[string]secret // O(1) runtime mapping
-	Secrets []secret          `json:"secrets"`
+	KeysMap map[string]*secret // O(1) runtime mapping
+	Secrets []secret           `json:"secrets"`
 }
 
 func (v *vault) unmarshal(jsonString string) {
 	json.Unmarshal([]byte(jsonString), v)
 
-	v.KeysMap = make(map[string]secret)
+	v.KeysMap = make(map[string]*secret)
 	for _, secret := range v.Secrets {
-		v.KeysMap[secret.Name] = secret
+		v.KeysMap[secret.Name] = &secret
 	}
 }
 
@@ -56,7 +56,7 @@ func (v *vault) add(s secret) error {
 		v.Secrets = make([]secret, 1)
 	}
 	v.Secrets = append(v.Secrets, s)
-	v.KeysMap[s.Name] = s
+	v.KeysMap[s.Name] = &s
 	return nil
 }
 
@@ -109,6 +109,6 @@ func (v vault) getKeys() ([]string, error) {
 // Constructors
 
 func newVaultEmpty() *vault {
-	v := vault{"", "", map[string]secret{}, make([]secret, 0)}
+	v := vault{"", "", map[string]*secret{}, make([]secret, 0)}
 	return &v
 }
