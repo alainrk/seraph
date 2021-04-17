@@ -38,7 +38,6 @@ func main() {
 	)
 
 	for {
-		// index, _, _ := promptForSelect("Choose", []string{"Exit", "Open Vault", "New Vault", "TEST-PrintVault"})
 		index, _, _ := promptForSelect("Choose", []string{"Exit", "Open Vault", "New Vault"})
 
 		if index == exit {
@@ -47,12 +46,6 @@ func main() {
 
 		// Re-init at every cycle
 		ctx = &Context{}
-
-		// TEST - Removeme
-		if index == testVault {
-			chooseVault(ctx)
-			fmt.Println(ctx.vault.marshal())
-		}
 
 		if index == openVault {
 			// Opening existing vault
