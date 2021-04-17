@@ -63,7 +63,7 @@ func chooseVault(app *Context) error {
 		if err != nil {
 			fmt.Println("Error decoding crypted data. Check your password.", err)
 
-			retry, _ := promptForConfirm("Retry?")
+			retry, _ := promptForConfirm("Retry")
 			if !retry {
 				return err
 			}
