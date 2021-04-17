@@ -116,6 +116,7 @@ func insertSecretHandling(ctx *Context) {
 
 	ctx.vault.add(s)
 	saveVault(ctx, true)
+	clearScreen()
 }
 
 func getSecretHandling(ctx *Context) {
@@ -126,17 +127,18 @@ func getSecretHandling(ctx *Context) {
 
 	_, key, _ := promptForSelect("Choose", keys)
 
-	fmt.Println("\nName:", ctx.vault.KeysMap[key].Name)
-	fmt.Println("Username:", ctx.vault.KeysMap[key].Username)
-	fmt.Println("Email:", ctx.vault.KeysMap[key].Email)
-	fmt.Println("Password:", ctx.vault.KeysMap[key].Password)
-	fmt.Println("ApiKey:", ctx.vault.KeysMap[key].ApiKey)
-	fmt.Println("Notes:", ctx.vault.KeysMap[key].Notes+"\n")
+	fmt.Printf("\nName: %s", ctx.vault.KeysMap[key].Name)
+	fmt.Printf("\nUsername: %s", ctx.vault.KeysMap[key].Username)
+	fmt.Printf("\nEmail: %s", ctx.vault.KeysMap[key].Email)
+	fmt.Printf("\nPassword: %s", ctx.vault.KeysMap[key].Password)
+	fmt.Printf("\nApiKey: %s", ctx.vault.KeysMap[key].ApiKey)
+	fmt.Printf("\nNotes: %s\n\n", ctx.vault.KeysMap[key].Notes)
 
 	promptToJustWait()
+	clearScreen()
 }
 
-func newVaultHandling(ctx *Context) {
+func newVaultHandling(ctx *Context) error {
 	// Validate already exist vault
 	vaults := getVaults()
 	validatorVaultNotExists := func(s string) error {
@@ -150,14 +152,14 @@ func newVaultHandling(ctx *Context) {
 
 	newVaultName := promptForTextValid("Vault name", validatorVaultNotExists)
 	newVaultName = newVaultName + ".vault"
-	fmt.Println("new vault", newVaultName)
-
 	newVaultPath := filepath.Join(vaultDirectory, newVaultName)
 
 	// Create the vault
 	f, err := os.Create(newVaultPath)
-	check(err)
 	defer f.Close()
+	if err != nil {
+		return err
+	}
 
 	// Init the vault's password
 	password, _ := promptForPassword("Password", validatePassword)
@@ -172,6 +174,7 @@ func newVaultHandling(ctx *Context) {
 		return nil
 	}
 	_, _ = promptForPassword("Confirm", validatorConfirm)
+	clearScreen()
 
 	ctx.hashedPassword = hashPassword(password)
 
@@ -181,6 +184,7 @@ func newVaultHandling(ctx *Context) {
 	ctx.vault = v
 
 	saveVault(ctx, false)
+	return nil
 }
 
 func saveVault(ctx *Context, askConfirm bool) {

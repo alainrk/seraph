@@ -60,7 +60,12 @@ func main() {
 			openedVaultHandling(ctx)
 		} else if index == newVault {
 			// Create new vault
-			newVaultHandling(ctx)
+			err := newVaultHandling(ctx)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			openedVaultHandling(ctx)
 		}
 	}
 }

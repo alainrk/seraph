@@ -2,12 +2,10 @@
 
 ## High priority
 - getSecret step => if no keys have to go back automatically
-- getSecret step =>
-  - showing results has to be prettier
-  - there has to be a any-key waiting press to keep the results on the screen and on key press user can get back to menu
+- handle unique name => now same name overrides the previous one
+- edit secret
 
 ## Medium priority
-- (*) infinite loop of editing/adding
 - handle a bak file to avoid corrupted saving?
 
 ## Low priority
@@ -18,6 +16,11 @@
   - consider context issues
 
 # Doing (*)
-- single session
+
+# Done
 - infinite loop stuff
 - panic
+- infinite loop of editing/adding
+- multiple vault handling same session
+- [getSecret] showing results has to be prettier
+- [getSecret] there has to be a any-key waiting press to keep the results on the screen and on key press user can get back to menu
