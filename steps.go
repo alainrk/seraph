@@ -99,7 +99,7 @@ func insertSecretHandling(app *Context) {
 	var value string
 	changed := false
 
-	fields := []string{"Exit", "Username", "Email", "Password", "ApiKey", "Notes"}
+	fields := []string{"Exit/Save", "Username", "Email", "Password", "ApiKey", "Notes"}
 	s := secret{}
 
 	nameValidator := func(name string) error {
@@ -118,7 +118,7 @@ func insertSecretHandling(app *Context) {
 
 	for {
 		_, choice, _ = promptForSelect("Choose a field to edit or exit", fields)
-		if choice == "Exit" {
+		if choice == "Exit/Save" {
 			break
 		}
 		value, _ = promptForText(choice)
