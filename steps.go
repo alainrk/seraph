@@ -34,6 +34,10 @@ func getVaults() []string {
 }
 
 func chooseVault(ctx *Context) error {
+	var vaultMarshaled string
+	var hashedPassword string
+	var err error
+
 	vaults := getVaults()
 	_, vaultName, _ := promptForSelect("Choose", vaults)
 
@@ -44,13 +48,20 @@ func chooseVault(ctx *Context) error {
 	dat, _ := ioutil.ReadFile(vaultPath)
 	ciphertext := string(dat)
 
-	password, _ := promptForPassword("Password", validatePassword)
-	ctx.hashedPassword = hashPassword(password)
+	for {
+		password, _ := promptForPassword("Password", validatePassword)
+		hashedPassword = hashPassword(password)
+		vaultMarshaled, err = decrypt(hashedPassword, ciphertext)
+		if err != nil {
+			fmt.Println("Error decoding crypted data. Check your password.", err)
 
-	vaultMarshaled, err := decrypt(ctx.hashedPassword, ciphertext)
-	if err != nil {
-		fmt.Println("Error decoding crypted data. Check your password.", err)
-		return err
+			retry, _ := promptForConfirm("Retry?")
+			if !retry {
+				return err
+			}
+		}
+		ctx.hashedPassword = hashedPassword
+		break
 	}
 
 	vault := newVaultEmpty()
@@ -123,6 +134,13 @@ func getSecretHandling(ctx *Context) {
 	keys := make([]string, 0)
 	for k, _ := range ctx.vault.KeysMap {
 		keys = append(keys, k)
+	}
+
+	if len(keys) == 0 {
+		fmt.Println("No items in this vault")
+		promptToJustWait()
+		clearScreen()
+		return
 	}
 
 	_, key, _ := promptForSelect("Choose", keys)

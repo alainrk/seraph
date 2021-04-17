@@ -56,7 +56,10 @@ func main() {
 
 		if index == openVault {
 			// Opening existing vault
-			chooseVault(ctx)
+			err := chooseVault(ctx)
+			if err != nil {
+				return
+			}
 			openedVaultHandling(ctx)
 		} else if index == newVault {
 			// Create new vault
