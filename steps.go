@@ -92,29 +92,45 @@ func insertSecretHandling(ctx *Context) {
 	var value string
 	changed := false
 
-	fields := []string{"Exit", "Name", "Username", "Email", "Password", "ApiKey", "Notes"}
+	fields := []string{"Exit", "Username", "Email", "Password", "ApiKey", "Notes"}
 	s := secret{}
+
+	nameValidator := func(name string) error {
+		value = strings.TrimSpace(name)
+		if _, ok := ctx.vault.KeysMap[value]; ok {
+			return errors.New("This item already exists, choose another name")
+		}
+		if len(value) == 0 {
+			return errors.New("Enter a non-empty name")
+		}
+		return nil
+	}
+
+	value = promptForTextValid("Choose a name", nameValidator)
+	s.Name = value
 
 	for {
 		_, choice, _ = promptForSelect("Choose a field to edit or exit", fields)
 		if choice == "Exit" {
 			break
 		}
-		changed = true
 		value, _ = promptForText(choice)
 		switch choice {
-		case "Name":
-			s.Name = value
 		case "Username":
 			s.Username = value
+			changed = true
 		case "Email":
 			s.Email = value
+			changed = true
 		case "Password":
 			s.Password = value
+			changed = true
 		case "ApiKey":
 			s.ApiKey = value
+			changed = true
 		case "Notes":
 			s.Notes = value
+			changed = true
 		}
 	}
 
