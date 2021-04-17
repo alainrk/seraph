@@ -33,7 +33,7 @@ func getVaults() []string {
 	return files
 }
 
-func chooseVault(ctx *Context) error {
+func chooseVault(app *Context) error {
 	var vaultMarshaled string
 	var hashedPassword string
 	var err error
@@ -60,7 +60,7 @@ func chooseVault(ctx *Context) error {
 				return err
 			}
 		}
-		ctx.hashedPassword = hashedPassword
+		app.hashedPassword = hashedPassword
 		break
 	}
 
@@ -69,25 +69,25 @@ func chooseVault(ctx *Context) error {
 	vault.path = vaultPath
 	vault.unmarshal(vaultMarshaled)
 
-	ctx.vault = vault
+	app.vault = vault
 	return nil
 }
 
-func openedVaultHandling(ctx *Context) {
+func openedVaultHandling(app *Context) {
 	for {
 		index, _, _ := promptForSelect("Choose", []string{"Back", "Get secret", "Insert secret"})
 
 		if index == back {
 			return
 		} else if index == insertSecret {
-			insertSecretHandling(ctx)
+			insertSecretHandling(app)
 		} else if index == getSecret {
-			getSecretHandling(ctx)
+			getSecretHandling(app)
 		}
 	}
 }
 
-func insertSecretHandling(ctx *Context) {
+func insertSecretHandling(app *Context) {
 	var choice string
 	var value string
 	changed := false
@@ -97,7 +97,7 @@ func insertSecretHandling(ctx *Context) {
 
 	nameValidator := func(name string) error {
 		value = strings.TrimSpace(name)
-		if _, ok := ctx.vault.KeysMap[value]; ok {
+		if _, ok := app.vault.KeysMap[value]; ok {
 			return errors.New("This item already exists, choose another name")
 		}
 		if len(value) == 0 {
@@ -141,14 +141,14 @@ func insertSecretHandling(ctx *Context) {
 	s.CreatedAt = time.Now().Format(dateTimeFormat)
 	s.UpdatedAt = time.Now().Format(dateTimeFormat)
 
-	ctx.vault.add(s)
-	saveVault(ctx, true)
+	app.vault.add(s)
+	saveVault(app, true)
 	clearScreen()
 }
 
-func getSecretHandling(ctx *Context) {
+func getSecretHandling(app *Context) {
 	keys := make([]string, 0)
-	for k, _ := range ctx.vault.KeysMap {
+	for k, _ := range app.vault.KeysMap {
 		keys = append(keys, k)
 	}
 
@@ -161,18 +161,18 @@ func getSecretHandling(ctx *Context) {
 
 	_, key, _ := promptForSelect("Choose", keys)
 
-	fmt.Printf("\nName: %s", ctx.vault.KeysMap[key].Name)
-	fmt.Printf("\nUsername: %s", ctx.vault.KeysMap[key].Username)
-	fmt.Printf("\nEmail: %s", ctx.vault.KeysMap[key].Email)
-	fmt.Printf("\nPassword: %s", ctx.vault.KeysMap[key].Password)
-	fmt.Printf("\nApiKey: %s", ctx.vault.KeysMap[key].ApiKey)
-	fmt.Printf("\nNotes: %s\n\n", ctx.vault.KeysMap[key].Notes)
+	fmt.Printf("\nName: %s", app.vault.KeysMap[key].Name)
+	fmt.Printf("\nUsername: %s", app.vault.KeysMap[key].Username)
+	fmt.Printf("\nEmail: %s", app.vault.KeysMap[key].Email)
+	fmt.Printf("\nPassword: %s", app.vault.KeysMap[key].Password)
+	fmt.Printf("\nApiKey: %s", app.vault.KeysMap[key].ApiKey)
+	fmt.Printf("\nNotes: %s\n\n", app.vault.KeysMap[key].Notes)
 
 	promptToJustWait()
 	clearScreen()
 }
 
-func newVaultHandling(ctx *Context) error {
+func newVaultHandling(app *Context) error {
 	// Validate already exist vault
 	vaults := getVaults()
 	validatorVaultNotExists := func(s string) error {
@@ -210,18 +210,18 @@ func newVaultHandling(ctx *Context) error {
 	_, _ = promptForPassword("Confirm", validatorConfirm)
 	clearScreen()
 
-	ctx.hashedPassword = hashPassword(password)
+	app.hashedPassword = hashPassword(password)
 
 	v := newVaultEmpty()
 	v.name = newVaultName
 	v.path = newVaultPath
-	ctx.vault = v
+	app.vault = v
 
-	saveVault(ctx, false)
+	saveVault(app, false)
 	return nil
 }
 
-func saveVault(ctx *Context, askConfirm bool) {
+func saveVault(app *Context, askConfirm bool) {
 	if askConfirm {
 		confirm, _ := promptForConfirm("Save")
 		if confirm == false {
@@ -229,9 +229,9 @@ func saveVault(ctx *Context, askConfirm bool) {
 			return
 		}
 	}
-	marshaledPlainText := ctx.vault.marshal()
-	marshaledCipherText := encrypt(ctx.hashedPassword, marshaledPlainText)
-	err := ioutil.WriteFile(ctx.vault.path, []byte(marshaledCipherText), 0644)
+	marshaledPlainText := app.vault.marshal()
+	marshaledCipherText := encrypt(app.hashedPassword, marshaledPlainText)
+	err := ioutil.WriteFile(app.vault.path, []byte(marshaledCipherText), 0644)
 	check(err)
-	fmt.Printf("Encrypted file to %s\n", ctx.vault.path)
+	fmt.Printf("Encrypted file to %s\n", app.vault.path)
 }

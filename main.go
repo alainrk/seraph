@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const (
 	dateTimeFormat string = "2006-01-02T15:04:05-0700"
@@ -9,6 +11,14 @@ const (
 const (
 	vaultDirectory          = "./vaults/"
 	vaultAlreadyExistsError = "vault already exists"
+)
+
+// Step 0
+const (
+	exit int = iota
+	openVault
+	newVault
+	testVault
 )
 
 func check(e error) {
@@ -24,18 +34,10 @@ type Context struct {
 }
 
 func main() {
-	var ctx *Context
+	var app *Context
 
 	// TODO: Non-interactive handling
 	// flags := getFlags()
-
-	// Step 0
-	const (
-		exit int = iota
-		openVault
-		newVault
-		testVault
-	)
 
 	for {
 		index, _, _ := promptForSelect("Choose", []string{"Exit", "Open Vault", "New Vault"})
@@ -45,23 +47,23 @@ func main() {
 		}
 
 		// Re-init at every cycle
-		ctx = &Context{}
+		app = &Context{}
 
 		if index == openVault {
 			// Opening existing vault
-			err := chooseVault(ctx)
+			err := chooseVault(app)
 			if err != nil {
 				return
 			}
-			openedVaultHandling(ctx)
+			openedVaultHandling(app)
 		} else if index == newVault {
 			// Create new vault
-			err := newVaultHandling(ctx)
+			err := newVaultHandling(app)
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
-			openedVaultHandling(ctx)
+			openedVaultHandling(app)
 		}
 	}
 }
