@@ -39,6 +39,13 @@ func chooseVault(app *Context) error {
 	var err error
 
 	vaults := getVaults()
+
+	if len(vaults) == 0 {
+		fmt.Println("You have no vaults")
+		promptToJustWait()
+		return errors.New("No vaults")
+	}
+
 	_, vaultName, _ := promptForSelect("Choose", vaults)
 
 	fmt.Println("Opening vault", vaultName, "...")
