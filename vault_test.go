@@ -68,7 +68,7 @@ func TestVaultOperations(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	assert.Equal(t, keys[2], "Lorem", "they should be different")
+	assert.Equal(t, keys[2], "Lorem", "they should be equal")
 }
 
 func TestEmptyVault(t *testing.T) {
@@ -77,7 +77,20 @@ func TestEmptyVault(t *testing.T) {
 	v.unmarshal(jsonString)
 
 	keys, _ := v.getKeys()
-	if len(keys) != 0 {
-		t.Errorf("Error empty vault, expected 0 elements, given %d", len(keys))
-	}
+	assert.Equal(t, len(keys), 0, "they should be equal")
+}
+
+func TestSecretAssignment(t *testing.T) {
+
+	s := secret{}
+	s.Name = "Lorem"
+	s.Email = "dolor@s.it"
+
+	assert.Equal(t, s.Name, "Lorem", "they should be equal")
+
+	s.assignValueToSecretStringField("Name", "Elon")
+	s.assignValueToSecretStringField("Email", "elon@gmail.com")
+
+	assert.Equal(t, s.Name, "Elon", "they should be equal")
+	assert.Equal(t, s.Email, "elon@gmail.com", "they should be equal")
 }

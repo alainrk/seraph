@@ -106,6 +106,24 @@ func (v vault) getKeys() ([]string, error) {
 	return keys, nil
 }
 
+// Reflect alternative - Wrapper for field assignment
+func (s *secret) assignValueToSecretStringField(fieldName string, value string) {
+	switch fieldName {
+	case "Name":
+		s.Name = value
+	case "Username":
+		s.Username = value
+	case "Email":
+		s.Email = value
+	case "Password":
+		s.Password = value
+	case "ApiKey":
+		s.ApiKey = value
+	case "Notes":
+		s.Notes = value
+	}
+}
+
 // Constructors
 
 func newVaultEmpty() *vault {
