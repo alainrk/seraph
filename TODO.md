@@ -14,8 +14,9 @@
 - better const (mainly steps ones) handling, it's shit now
 
 # Doing
-- edited BUT NOT saved fields, are correctly not stored on crypted file, but still remain in app context => they have to be cleared, otherwise visible to the user when getsecret is called
+
 # Done
+- edited BUT NOT saved fields, are correctly not stored on crypted file, but still remain in app context => they have to be cleared, otherwise visible to the user when getsecret is called
 - infinite loop stuff
 - single session => multiple vault handling?
 - infinite loop of editing/adding
