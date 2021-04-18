@@ -125,21 +125,8 @@ func insertSecretHandling(app *Context) {
 			break
 		}
 		value, _ = promptForText(choice)
-		switch choice {
-		case "Username":
-			s.Username = value
-			changed = true
-		case "Email":
-			s.Email = value
-			changed = true
-		case "Password":
-			s.Password = value
-			changed = true
-		case "ApiKey":
-			s.ApiKey = value
-			changed = true
-		case "Notes":
-			s.Notes = value
+		field, _ := s.assignValueToSecretStringField(choice, value)
+		if field == choice {
 			changed = true
 		}
 	}

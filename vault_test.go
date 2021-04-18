@@ -93,4 +93,8 @@ func TestSecretAssignment(t *testing.T) {
 
 	assert.Equal(t, s.Name, "Elon", "they should be equal")
 	assert.Equal(t, s.Email, "elon@gmail.com", "they should be equal")
+
+	field, err := s.assignValueToSecretStringField("__improbable_existing_field__", "elon@gmail.com")
+	assert.Equal(t, field, "", "they should be equal")
+	assert.NotNil(t, err, "there should be an error if field does not exist")
 }

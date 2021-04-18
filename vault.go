@@ -107,7 +107,8 @@ func (v vault) getKeys() ([]string, error) {
 }
 
 // Reflect alternative - Wrapper for field assignment
-func (s *secret) assignValueToSecretStringField(fieldName string, value string) {
+// Return fieldName if matched, error otherwise
+func (s *secret) assignValueToSecretStringField(fieldName string, value string) (string, error) {
 	switch fieldName {
 	case "Name":
 		s.Name = value
@@ -121,7 +122,10 @@ func (s *secret) assignValueToSecretStringField(fieldName string, value string) 
 		s.ApiKey = value
 	case "Notes":
 		s.Notes = value
+	default:
+		return "", errors.New("given field does not exist")
 	}
+	return fieldName, nil
 }
 
 // Constructors
