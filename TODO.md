@@ -1,6 +1,8 @@
 # Random things wondering to do
 
 ## High priority
+- bug on retry password, an empty vault is initialized
+- edited BUT NOT saved fields, are correctly not stored on crypted file, but still remain in app context => they have to be cleared, otherwise visible to the user when getsecret is called
 
 ## Medium priority
 - handle a bak file to avoid corrupted saving?

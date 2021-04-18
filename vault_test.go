@@ -36,6 +36,11 @@ func TestVaultCreateStub(t *testing.T) {
 	err := v.unmarshal(jsonString)
 	assert.Nil(t, err, "there should not be an error in unmarshalling")
 
+	assert.Equal(t, v.KeysMap["GMAIL"].Name, "GMAIL", "they should be equal")
+	assert.Equal(t, v.KeysMap["GMAIL"].Email, "gmail@email.com", "they should be equal")
+	assert.Equal(t, v.KeysMap["JIRA"].Username, "jitark", "they should be equal")
+	assert.Equal(t, v.KeysMap["GITHUB"].Username, "gitbabbo", "they should be equal")
+
 	marshaledPlainText := v.marshal()
 	hashedPassword := hashPassword("password")
 	marshaledCipherText := encrypt(hashedPassword, marshaledPlainText)

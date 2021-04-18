@@ -40,8 +40,8 @@ func (v *vault) unmarshal(jsonString string) error {
 	}
 
 	v.KeysMap = make(map[string]*secret)
-	for _, secret := range v.Secrets {
-		v.KeysMap[secret.Name] = &secret
+	for index, secret := range v.Secrets {
+		v.KeysMap[secret.Name] = &v.Secrets[index]
 	}
 	return nil
 }
