@@ -30,7 +30,6 @@ func check(e error) {
 type Context struct {
 	hashedPassword string
 	vault          *vault
-	currentStep    string
 }
 
 func main() {

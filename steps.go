@@ -44,7 +44,7 @@ func chooseVault(app *Context) error {
 	if len(vaults) == 0 {
 		fmt.Println("You have no vaults")
 		promptToJustWait()
-		return errors.New("No vaults")
+		return errors.New("no vaults")
 	}
 
 	_, vaultName, _ := promptForSelect("Choose", vaults)
@@ -56,6 +56,7 @@ func chooseVault(app *Context) error {
 	dat, _ := ioutil.ReadFile(vaultPath)
 	ciphertext := string(dat)
 
+	count := 1
 	for {
 		password, _ := promptForPassword("Password", validatePassword)
 		hashedPassword = hashPassword(password)
@@ -69,7 +70,11 @@ func chooseVault(app *Context) error {
 			}
 		}
 		app.hashedPassword = hashedPassword
-		break
+
+		count -= 1
+		if count <= 0 {
+			break
+		}
 	}
 
 	vault := newVaultEmpty()
@@ -149,7 +154,7 @@ func editSecretHandling(app *Context) {
 	changed := false
 
 	keys := make([]string, 0)
-	for k, _ := range app.vault.KeysMap {
+	for k := range app.vault.KeysMap {
 		keys = append(keys, k)
 	}
 
@@ -192,7 +197,7 @@ func editSecretHandling(app *Context) {
 
 func getSecretHandling(app *Context) {
 	keys := make([]string, 0)
-	for k, _ := range app.vault.KeysMap {
+	for k := range app.vault.KeysMap {
 		keys = append(keys, k)
 	}
 
@@ -234,10 +239,10 @@ func newVaultHandling(app *Context) error {
 
 	// Create the vault
 	f, err := os.Create(newVaultPath)
-	defer f.Close()
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
 	// Init the vault's password
 	password, _ := promptForPassword("Password", validatePassword)
