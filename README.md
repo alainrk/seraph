@@ -4,7 +4,7 @@
 
 Multi-vaults secrets keeper
 
-![Seraph Matrix Banner](https://github.com/alainrk/seraph/raw/master/example/matrix.jpeg)
+![Seraph Matrix Banner](https://github.com/alainrk/seraph/raw/master/example/matrix.png)
 
 Experimental. DON'T USE IT YET.
 
