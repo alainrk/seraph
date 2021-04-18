@@ -108,10 +108,10 @@ func insertSecretHandling(app *Context) {
 	nameValidator := func(name string) error {
 		value = strings.TrimSpace(name)
 		if _, ok := app.vault.KeysMap[value]; ok {
-			return errors.New("This item already exists, choose another name")
+			return errors.New("this item already exists, choose another name")
 		}
 		if len(value) == 0 {
-			return errors.New("Enter a non-empty name")
+			return errors.New("enter a non-empty name")
 		}
 		return nil
 	}
@@ -171,21 +171,8 @@ func editSecretHandling(app *Context) {
 			break
 		}
 		value, _ = promptForText(choice)
-		switch choice {
-		case "Username":
-			s.Username = value
-			changed = true
-		case "Email":
-			s.Email = value
-			changed = true
-		case "Password":
-			s.Password = value
-			changed = true
-		case "ApiKey":
-			s.ApiKey = value
-			changed = true
-		case "Notes":
-			s.Notes = value
+		field, _ := s.assignValueToSecretStringField(choice, value)
+		if field == choice {
 			changed = true
 		}
 	}
