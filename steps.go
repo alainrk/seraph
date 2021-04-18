@@ -167,10 +167,11 @@ func editSecretHandling(app *Context) {
 
 	_, key, _ := promptForSelect("Choose", keys)
 
-	s := app.vault.KeysMap[key]
-	fmt.Println("CHOOSEN KEY = ", key)
-	fmt.Println("CHOOSEN SECRET = ", s)
-	promptToJustWait()
+	currentSecret := app.vault.KeysMap[key]
+
+	tmpSecret := secret{}
+	tmpSecret.deepCopy(currentSecret)
+
 	fields := []string{"Exit/Save", "Username", "Email", "Password", "ApiKey", "Notes"}
 
 	for {
@@ -179,19 +180,28 @@ func editSecretHandling(app *Context) {
 			break
 		}
 		value, _ = promptForText(choice)
-		field, _ := s.assignValueToSecretStringField(choice, value)
+		field, _ := tmpSecret.assignValueToSecretStringField(choice, value)
 		if field == choice {
 			changed = true
 		}
 	}
 
+	// If nothing has changed, return
 	if !changed {
 		return
 	}
 
-	s.UpdatedAt = time.Now().Format(dateTimeFormat)
+	// I want to ask for confirmation here, so in case of deny, changes are not applied
+	confirm, _ := promptForConfirm("Save")
+	if !confirm {
+		fmt.Println("Changes not saved")
+		return
+	}
 
-	saveVault(app, true)
+	currentSecret.deepCopy(&tmpSecret)
+	currentSecret.UpdatedAt = time.Now().Format(dateTimeFormat)
+
+	saveVault(app, false)
 	clearScreen()
 }
 

@@ -2,18 +2,19 @@
 
 ## High priority
 - bug on retry password, an empty vault is initialized
-- edited BUT NOT saved fields, are correctly not stored on crypted file, but still remain in app context => they have to be cleared, otherwise visible to the user when getsecret is called
 
 ## Medium priority
 - handle a bak file to avoid corrupted saving?
 - preview editing value
+- delete an item
+- rename an item (consider consistent keysmap handling)
 
 ## Low priority
 - custom fields?
 - better const (mainly steps ones) handling, it's shit now
 
 # Doing
-
+- edited BUT NOT saved fields, are correctly not stored on crypted file, but still remain in app context => they have to be cleared, otherwise visible to the user when getsecret is called
 # Done
 - infinite loop stuff
 - single session => multiple vault handling?

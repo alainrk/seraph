@@ -132,6 +132,17 @@ func (s *secret) assignValueToSecretStringField(fieldName string, value string) 
 	return fieldName, nil
 }
 
+func (dest *secret) deepCopy(src *secret) {
+	dest.Name = src.Name
+	dest.Username = src.Username
+	dest.Email = src.Email
+	dest.Password = src.Password
+	dest.ApiKey = src.ApiKey
+	dest.Notes = src.Notes
+	dest.CreatedAt = src.CreatedAt
+	dest.UpdatedAt = src.UpdatedAt
+}
+
 // Constructors
 
 func newVaultEmpty() *vault {

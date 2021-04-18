@@ -11,7 +11,7 @@ import (
 
 const testVaultPath = "./vaults/__onlytest.vault"
 
-func truncateTestVault() {
+func truncateVault() {
 	f, err := os.OpenFile(testVaultPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		log.Fatal(err)
@@ -23,7 +23,7 @@ func truncateTestVault() {
 
 func TestVaultCreateStub(t *testing.T) {
 	v := newVaultEmpty()
-	truncateTestVault()
+	truncateVault()
 
 	jsonString := `{
 		"secrets": [
@@ -47,4 +47,29 @@ func TestVaultCreateStub(t *testing.T) {
 	err = ioutil.WriteFile(testVaultPath, []byte(marshaledCipherText), 0644)
 
 	assert.Nil(t, err, "they should be equal")
+}
+
+func TestSecretDeepCopy(t *testing.T) {
+	fakeVal := "xxx"
+	s := secret{}
+	s.Name = fakeVal
+	s.Username = fakeVal
+	s.Email = fakeVal
+	s.Password = fakeVal
+	s.ApiKey = fakeVal
+	s.Notes = fakeVal
+	s.CreatedAt = fakeVal
+	s.UpdatedAt = fakeVal
+
+	d := secret{}
+	d.deepCopy(&s)
+
+	assert.Equal(t, d.Name, s.Name, "they should be equal")
+	assert.Equal(t, d.Username, s.Username, "they should be equal")
+	assert.Equal(t, d.Email, s.Email, "they should be equal")
+	assert.Equal(t, d.Password, s.Password, "they should be equal")
+	assert.Equal(t, d.ApiKey, s.ApiKey, "they should be equal")
+	assert.Equal(t, d.Notes, s.Notes, "they should be equal")
+	assert.Equal(t, d.CreatedAt, s.CreatedAt, "they should be equal")
+	assert.Equal(t, d.UpdatedAt, s.UpdatedAt, "they should be equal")
 }
