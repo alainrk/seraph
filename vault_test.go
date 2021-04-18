@@ -1,100 +1,45 @@
 package main
 
 import (
+	"io/ioutil"
+	"log"
+	"os"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVaultMarshaling(t *testing.T) {
+const testVaultPath = "./vaults/__onlytest.vault"
+
+func truncateTestVault() {
+	f, err := os.OpenFile(testVaultPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := f.Close(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func TestVaultCreateStub(t *testing.T) {
 	v := newVaultEmpty()
+	truncateTestVault()
 
 	jsonString := `{
 		"secrets": [
-			{ "name": "GMAIL", "email": "test@email.com", "username": "alainrk", "password": "foobar", "apiKey": "3894H8ETW", "notes": "This is a secret", "createdAt": "2016-01-12T20:04:05-0700", "updatedAt": "2020-02-19T15:12:05-0700" },
-			{ "name": "JIRA", "email": "test@email.com", "username": "jita", "password": "batterystaple", "apiKey": null, "notes": "Jira secret go on", "createdAt": "2020-02-19T15:12:05-0700", "updatedAt": "2020-02-19T15:12:05-0700" }
+			{ "name": "GMAIL", "email": "gmail@email.com", "username": "alainrk", "password": "foobar", "apiKey": "3894H8ETW", "notes": "This is a secret", "createdAt": "2016-01-12T20:04:05-0700", "updatedAt": "2020-02-19T15:12:05-0700" },
+			{ "name": "JIRA", "email": "jira@email.com", "username": "jitark", "password": "batterystaple", "apiKey": null, "notes": "Jira secret go on", "createdAt": "2020-02-19T15:12:05-0700", "updatedAt": "2020-02-19T15:12:05-0700" },
+			{ "name": "GITHUB", "email": "github@email.com", "username": "gitbabbo", "password": "12345", "apiKey": null, "notes": "Github secret go on", "createdAt": "2020-02-19T15:12:05-0700", "updatedAt": "2020-02-19T15:12:05-0700" }
 		]
 	}`
 
-	v.unmarshal(jsonString)
+	err := v.unmarshal(jsonString)
+	assert.Nil(t, err, "there should not be an error in unmarshalling")
 
-	assert.Equal(t, v.Secrets[0].Name, "GMAIL", "they should be equal")
+	marshaledPlainText := v.marshal()
+	hashedPassword := hashPassword("password")
+	marshaledCipherText := encrypt(hashedPassword, marshaledPlainText)
+	err = ioutil.WriteFile(testVaultPath, []byte(marshaledCipherText), 0644)
 
-	assert.Equal(t, v.Secrets[1].Email, "test@email.com", "they should be equal")
-
-	assert.Equal(t, v.Secrets[1].ApiKey, "", "they should be equal")
-
-	marshaled := v.marshal()
-	unmarshaledVault := newVaultEmpty()
-	unmarshaledVault.unmarshal(marshaled)
-
-	assert.Equal(t, v.Secrets[0].Password, unmarshaledVault.Secrets[0].Password, "they should be equal")
-}
-
-func TestVaultOperations(t *testing.T) {
-	v := newVaultEmpty()
-	jsonString := `{ "secrets": [] }`
-	v.unmarshal(jsonString)
-
-	len, _ := v.len()
-	assert.Equal(t, len, 0, "they should be equal")
-
-	s := secret{}
-	s.Name = "Lorem"
-	s.Username = "ipsum"
-	s.Email = "dolor@s.it"
-	s.Password = "amet"
-	s.ApiKey = "0398509234"
-	s.Notes = "Test 1"
-	s.CreatedAt = time.Now().Format(dateTimeFormat)
-	s.UpdatedAt = time.Now().Format(dateTimeFormat)
-	v.add(s)
-
-	s.Name = "This is another"
-	s.Username = "Different item from the previous one"
-	v.add(s)
-
-	len, _ = v.len()
-	assert.Equal(t, len, 2, "they should be equal")
-
-	s.Name = "AKey number one"
-	v.add(s)
-	s.Name = "Das key nummer zwei"
-	v.add(s)
-	s.Name = "Ze kous nomiro dri"
-	v.add(s)
-	keys, err := v.getKeys()
-
-	assert.Nil(t, err)
-
-	assert.Equal(t, keys[2], "Lorem", "they should be equal")
-}
-
-func TestEmptyVault(t *testing.T) {
-	v := newVaultEmpty()
-	jsonString := `{ "secrets": [] }`
-	v.unmarshal(jsonString)
-
-	keys, _ := v.getKeys()
-	assert.Equal(t, len(keys), 0, "they should be equal")
-}
-
-func TestSecretAssignment(t *testing.T) {
-
-	s := secret{}
-	s.Name = "Lorem"
-	s.Email = "dolor@s.it"
-
-	assert.Equal(t, s.Name, "Lorem", "they should be equal")
-
-	s.assignValueToSecretStringField("Name", "Elon")
-	s.assignValueToSecretStringField("Email", "elon@gmail.com")
-
-	assert.Equal(t, s.Name, "Elon", "they should be equal")
-	assert.Equal(t, s.Email, "elon@gmail.com", "they should be equal")
-
-	field, err := s.assignValueToSecretStringField("__improbable_existing_field__", "elon@gmail.com")
-	assert.Equal(t, field, "", "they should be equal")
-	assert.NotNil(t, err, "there should be an error if field does not exist")
+	assert.Nil(t, err, "they should be equal")
 }

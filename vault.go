@@ -33,13 +33,17 @@ type vault struct {
 	Secrets []secret           `json:"secrets"`
 }
 
-func (v *vault) unmarshal(jsonString string) {
-	json.Unmarshal([]byte(jsonString), v)
+func (v *vault) unmarshal(jsonString string) error {
+	err := json.Unmarshal([]byte(jsonString), v)
+	if err != nil {
+		return nil
+	}
 
 	v.KeysMap = make(map[string]*secret)
 	for _, secret := range v.Secrets {
 		v.KeysMap[secret.Name] = &secret
 	}
+	return nil
 }
 
 // Get the string out of the vault

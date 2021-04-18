@@ -163,6 +163,9 @@ func editSecretHandling(app *Context) {
 	_, key, _ := promptForSelect("Choose", keys)
 
 	s := app.vault.KeysMap[key]
+	fmt.Println("CHOOSEN KEY = ", key)
+	fmt.Println("CHOOSEN SECRET = ", s)
+	promptToJustWait()
 	fields := []string{"Exit/Save", "Username", "Email", "Password", "ApiKey", "Notes"}
 
 	for {
@@ -265,7 +268,7 @@ func newVaultHandling(app *Context) error {
 func saveVault(app *Context, askConfirm bool) {
 	if askConfirm {
 		confirm, _ := promptForConfirm("Save")
-		if confirm == false {
+		if !confirm {
 			fmt.Println("Changes not saved")
 			return
 		}
