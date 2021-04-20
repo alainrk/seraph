@@ -8,26 +8,37 @@ Multi-vaults secrets keeper
 
 Experimental. DON'T USE IT YET.
 
-# Usage [NEW]
+## Usage
 ```
 $ ./seraph
 # Follow interactive instructions
 ```
-
+### Secrets handling
 ![Seraph GIF Example](https://github.com/alainrk/seraph/raw/master/example/seraph.gif)
 
-# Dev
-## Mod init
+### Multiple vaults
+![Multiple Vaults GIF Example](https://github.com/alainrk/seraph/raw/master/example/vaults.gif)
+
+## Dev
+
+### Mod init
 ```
 go mod init github.com/alainrk/seraph
 ```
 
-## Build everything recursively
+### Test everything recursively
+```
+chmod +x test.sh
+./test.sh
+```
+
+### Build everything recursively
 ```
 go build ./...
 ```
 
-## Test everything recursively
+### Cross compilation for multiple arch
 ```
-go test ./...
+chmod +x crosscompile.sh
+./crosscompile.sh
 ```
