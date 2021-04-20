@@ -19,6 +19,16 @@ const (
 	deleteSecret
 )
 
+func initVaultDirectory() error {
+	if _, err := os.Stat(vaultDirectory); os.IsNotExist(err) {
+		err = os.Mkdir(vaultDirectory, 0755)
+		if err != nil {
+			check(err)
+		}
+	}
+	return nil
+}
+
 func getVaults() []string {
 	var files []string
 

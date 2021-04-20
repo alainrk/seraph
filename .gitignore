@@ -6,9 +6,7 @@
 *.dylib
 
 # Runtime assets
-# exclude everything
-vaults/*
-!vaults/.gitkeep
+SeraphVaults
 seraph
 
 # Test binary, built with `go test -c`

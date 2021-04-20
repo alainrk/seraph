@@ -9,7 +9,7 @@ const (
 )
 
 const (
-	vaultDirectory          = "./vaults/"
+	vaultDirectory          = "./SeraphVaults/"
 	vaultAlreadyExistsError = "vault already exists"
 )
 
@@ -35,6 +35,7 @@ type Context struct {
 func main() {
 	var app *Context
 	clearScreen()
+	initVaultDirectory()
 
 	// TODO: Non-interactive handling
 	// flags := getFlags()
@@ -53,7 +54,7 @@ func main() {
 			// Opening existing vault
 			err := chooseVault(app)
 			if err != nil {
-				return
+				continue
 			}
 			openedVaultHandling(app)
 		} else if index == newVault {
