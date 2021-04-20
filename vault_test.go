@@ -4,14 +4,14 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-const testVaultPath = "./vaults/__onlytest.vault"
-
 func truncateVault() {
+	testVaultPath := filepath.Join(vaultDirectory, "__onlytest.vault")
 	f, err := os.OpenFile(testVaultPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		log.Fatal(err)
@@ -119,6 +119,7 @@ func TestSecretAssignment(t *testing.T) {
 
 func TestVaultCreateStub(t *testing.T) {
 	v := newVaultEmpty()
+	initVaultDirectory()
 	truncateVault()
 
 	jsonString := `{
@@ -140,6 +141,8 @@ func TestVaultCreateStub(t *testing.T) {
 	marshaledPlainText := v.marshal()
 	hashedPassword := hashPassword("password")
 	marshaledCipherText := encrypt(hashedPassword, marshaledPlainText)
+
+	testVaultPath := filepath.Join(vaultDirectory, "__onlytest.vault")
 	err = ioutil.WriteFile(testVaultPath, []byte(marshaledCipherText), 0644)
 
 	assert.Nil(t, err, "they should be equal")

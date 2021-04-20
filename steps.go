@@ -25,6 +25,10 @@ func initVaultDirectory() error {
 		if err != nil {
 			check(err)
 		}
+
+		fullpath, _ := filepath.Abs(vaultDirectory)
+		fmt.Printf("\nNo vaults folder has been found.\nA new vaults folder has been created at %s\n", fullpath)
+		promptToJustWait()
 	}
 	return nil
 }
