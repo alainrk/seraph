@@ -34,6 +34,7 @@ type Context struct {
 
 func main() {
 	var app *Context
+	clearScreen()
 
 	// TODO: Non-interactive handling
 	// flags := getFlags()

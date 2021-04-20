@@ -57,7 +57,6 @@ func chooseVault(app *Context) error {
 	dat, _ := ioutil.ReadFile(vaultPath)
 	ciphertext := string(dat)
 
-	count := 1
 	for {
 		password, _ := promptForPassword("Password", validatePassword)
 		hashedPassword = hashPassword(password)
@@ -69,13 +68,10 @@ func chooseVault(app *Context) error {
 			if !retry {
 				return err
 			}
+			continue
 		}
 		app.hashedPassword = hashedPassword
-
-		count -= 1
-		if count <= 0 {
-			break
-		}
+		break
 	}
 
 	vault := newVaultEmpty()

@@ -1,7 +1,6 @@
 # Random things wondering to do
 
 ## High priority
-- bug on retry password, an empty vault is initialized
 
 ## Medium priority
 - create vault folder at startup
@@ -15,6 +14,7 @@
 # Doing
 
 # Done
+- bug on retry password, an empty vault is initialized
 - delete an item
 - edited BUT NOT saved fields, are correctly not stored on crypted file, but still remain in app context => they have to be cleared, otherwise visible to the user when getsecret is called
 - preview editing value
