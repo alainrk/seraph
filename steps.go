@@ -16,6 +16,7 @@ const (
 	getSecret
 	insertSecret
 	editSecret
+	deleteSecret
 )
 
 func getVaults() []string {
@@ -88,7 +89,7 @@ func chooseVault(app *Context) error {
 
 func openedVaultHandling(app *Context) {
 	for {
-		index, _, _ := promptForSelect("Choose", []string{"Back", "Get secret", "Insert secret", "Edit secret"})
+		index, _, _ := promptForSelect("Choose", []string{"Back", "Get secret", "Insert secret", "Edit secret", "Delete secret"})
 
 		if index == back {
 			return
@@ -98,6 +99,8 @@ func openedVaultHandling(app *Context) {
 			getSecretHandling(app)
 		} else if index == editSecret {
 			editSecretHandling(app)
+		} else if index == deleteSecret {
+			deleteSecretHandling(app)
 		}
 	}
 }
@@ -210,6 +213,39 @@ func editSecretHandling(app *Context) {
 
 	currentSecret.deepCopy(&tmpSecret)
 	currentSecret.UpdatedAt = time.Now().Format(dateTimeFormat)
+
+	saveVault(app, false)
+	clearScreen()
+}
+
+func deleteSecretHandling(app *Context) {
+	keys := make([]string, 0)
+	for k := range app.vault.KeysMap {
+		keys = append(keys, k)
+	}
+
+	if len(keys) == 0 {
+		fmt.Println("No items in this vault")
+		promptToJustWait()
+		clearScreen()
+		return
+	}
+
+	_, key, _ := promptForSelect("Choose", keys)
+
+	currentSecret := app.vault.KeysMap[key]
+
+	// I want to ask for confirmation here, so in case of deny, changes are not applied
+	confirm, _ := promptForConfirm("Save")
+	if !confirm {
+		fmt.Println("Changes not saved")
+		return
+	}
+
+	err := app.vault.delete(currentSecret.Name)
+	if err != nil {
+		check(err)
+	}
 
 	saveVault(app, false)
 	clearScreen()
