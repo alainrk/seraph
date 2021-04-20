@@ -4,8 +4,8 @@
 - bug on retry password, an empty vault is initialized
 
 ## Medium priority
+- create vault folder at startup
 - handle a bak file to avoid corrupted saving?
-- delete an item
 - rename an item (consider consistent keysmap handling)
 
 ## Low priority
@@ -15,6 +15,7 @@
 # Doing
 
 # Done
+- delete an item
 - edited BUT NOT saved fields, are correctly not stored on crypted file, but still remain in app context => they have to be cleared, otherwise visible to the user when getsecret is called
 - preview editing value
 - infinite loop stuff
