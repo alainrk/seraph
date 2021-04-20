@@ -65,6 +65,22 @@ func (v *vault) add(s secret) error {
 	return nil
 }
 
+func (v *vault) delete(name string) error {
+	_, ok := v.KeysMap[name]
+	if ok {
+		delete(v.KeysMap, name)
+	} else {
+		return errors.New("given name does not exist")
+	}
+	for i, secret := range v.Secrets {
+		if secret.Name == name {
+			v.Secrets = append(v.Secrets[:i], v.Secrets[i+1:]...)
+			return nil
+		}
+	}
+	return nil
+}
+
 func (v vault) len() (int, error) {
 	return len(v.Secrets), nil
 }
