@@ -73,3 +73,25 @@ func TestSecretDeepCopy(t *testing.T) {
 	assert.Equal(t, d.CreatedAt, s.CreatedAt, "they should be equal")
 	assert.Equal(t, d.UpdatedAt, s.UpdatedAt, "they should be equal")
 }
+
+func TestReflectVault(t *testing.T) {
+	fakeVal := "xxx"
+	s := secret{}
+	s.Name = fakeVal
+	s.Username = fakeVal
+	s.Email = fakeVal
+	s.Password = fakeVal
+	s.ApiKey = fakeVal
+	s.Notes = fakeVal
+	s.CreatedAt = fakeVal
+	s.UpdatedAt = fakeVal
+
+	assert.Equal(t, s.getField("Name"), fakeVal, "they should be equal")
+	assert.Equal(t, s.getField("Username"), fakeVal, "they should be equal")
+	assert.Equal(t, s.getField("Email"), fakeVal, "they should be equal")
+	assert.Equal(t, s.getField("Password"), fakeVal, "they should be equal")
+	assert.Equal(t, s.getField("ApiKey"), fakeVal, "they should be equal")
+	assert.Equal(t, s.getField("Notes"), fakeVal, "they should be equal")
+	assert.Equal(t, s.getField("CreatedAt"), fakeVal, "they should be equal")
+	assert.Equal(t, s.getField("UpdatedAt"), fakeVal, "they should be equal")
+}

@@ -5,7 +5,6 @@
 
 ## Medium priority
 - handle a bak file to avoid corrupted saving?
-- preview editing value
 - delete an item
 - rename an item (consider consistent keysmap handling)
 
@@ -17,6 +16,7 @@
 
 # Done
 - edited BUT NOT saved fields, are correctly not stored on crypted file, but still remain in app context => they have to be cleared, otherwise visible to the user when getsecret is called
+- preview editing value
 - infinite loop stuff
 - single session => multiple vault handling?
 - infinite loop of editing/adding

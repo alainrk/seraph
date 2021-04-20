@@ -179,10 +179,20 @@ func editSecretHandling(app *Context) {
 		if choice == "Exit/Save" {
 			break
 		}
-		value, _ = promptForText(choice)
-		field, _ := tmpSecret.assignValueToSecretStringField(choice, value)
-		if field == choice {
-			changed = true
+
+		promptText := choice
+		currentVal := tmpSecret.getField(choice)
+		if currentVal != "" {
+			promptText += " [" + currentVal + "]"
+		}
+
+		value, _ = promptForText(promptText)
+		value = strings.TrimSpace(value)
+		if len(value) > 0 {
+			field, _ := tmpSecret.assignValueToSecretStringField(choice, value)
+			if field == choice {
+				changed = true
+			}
 		}
 	}
 

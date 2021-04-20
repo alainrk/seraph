@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"reflect"
 )
 
 const (
@@ -130,6 +131,15 @@ func (s *secret) assignValueToSecretStringField(fieldName string, value string) 
 		return "", errors.New("given field does not exist")
 	}
 	return fieldName, nil
+}
+
+// Secret stuff
+
+// TODO Refactor this with no reflect
+func (s *secret) getField(field string) string {
+	r := reflect.ValueOf(s)
+	f := reflect.Indirect(r).FieldByName(field)
+	return f.String()
 }
 
 func (dest *secret) deepCopy(src *secret) {
