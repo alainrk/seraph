@@ -2,7 +2,7 @@
 [![YourActionName Actions Status](https://github.com/alainrk/seraph/workflows/Go/badge.svg)](https://github.com/alainrk/seraph/actions)
 [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
 
-Multi-vaults secrets keeper
+Offline, multi-vaults, terminal-based password/secrets keeper.
 
 ![Seraph Matrix Banner](https://github.com/alainrk/seraph/raw/master/example/matrix.png)
 
