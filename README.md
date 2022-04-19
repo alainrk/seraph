@@ -21,14 +21,8 @@ $ ./seraph
 
 ## Dev
 
-### Mod init
+### Test
 ```
-go mod init github.com/alainrk/seraph
-```
-
-### Test everything recursively
-```
-chmod +x test.sh
 ./test.sh
 ```
 
