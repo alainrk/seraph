@@ -1,12 +1,9 @@
 # Seraph
-[![YourActionName Actions Status](https://github.com/alainrk/seraph/workflows/Go/badge.svg)](https://github.com/alainrk/seraph/actions)
-[![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
+[![Status](https://github.com/alainrk/seraph/workflows/Go/badge.svg)](https://github.com/alainrk/seraph/actions)
 
 Offline, multi-vaults, terminal-based passwords/secrets keeper.
 
 ![Seraph Matrix Banner](https://github.com/alainrk/seraph/raw/master/example/matrix.png)
-
-Experimental. DON'T USE IT YET.
 
 ## Usage
 ```
