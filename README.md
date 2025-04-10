@@ -1,5 +1,4 @@
 # Seraph
-[![Status](https://github.com/alainrk/seraph/workflows/Go/badge.svg)](https://github.com/alainrk/seraph/actions)
 
 Offline, multi-vaults, terminal-based passwords/secrets keeper.
 
